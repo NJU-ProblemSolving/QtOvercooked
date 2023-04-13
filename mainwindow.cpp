@@ -5,26 +5,25 @@
 #include <QElapsedTimer>
 #include <QTimer>
 
-#include "levelmanager.h"
+#include "gamemanager.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
-    gameScene = new GameScene();
-    gameScene->setParent(this);
-    auto view = new QGraphicsView(gameScene, this);
+    guiManager = new GuiManager();
+    guiManager->setParent(this);
+    auto view = new QGraphicsView(guiManager, this);
     view->setFrameStyle(QFrame::NoFrame);
     view->resize(this->size());
     view->setSceneRect(QRect(0, 0, 400, 400));
 
-    auto levelManager = new LevelManager();
-    levelManager->setScene(gameScene);
-    levelManager->loadLevel("D:/QtOvercooked/level1.txt");
+    guiManager->load("D:/QtOvercooked/level1.txt");
 
     updateTimer = new QTimer(this);
     auto time = new QElapsedTimer();
     updateTimer->setInterval(1000.0f / FPS);
-    connect(updateTimer, &QTimer::timeout, this, [=]() { levelManager->step(); });
+    connect(updateTimer, &QTimer::timeout, guiManager,
+            &GuiManager::step);
     updateTimer->start();
 }
 

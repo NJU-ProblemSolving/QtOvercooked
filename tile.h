@@ -1,36 +1,43 @@
-#ifndef TILE_H_
-#define TILE_H_
+#pragma once
 
 #include <box2d/box2d.h>
+#include <optional>
 
+#include "foodcontainer.h"
 #include "interfaces.h"
+#include "mixture.h"
+#include "recipe.h"
 
-enum class TileKind {
-    None,
-    Void,
-    Floor,
-    Wall,
-    Table,
-    Pantry,
-    CuttingBoard,
-    WashBowl,
-    Stove,
-    Trashbin,
-};
 
-class Tile : public IEntity {
+class GameManager;
+
+class Tile : public IBody {
   public:
     Tile() {}
 
+    b2Vec2 getPos() { return position; }
     void setPos(b2Vec2 position) { this->position = position; }
 
     virtual void initB2(b2World *world) {}
+    void setLevelManager(GameManager *levelManager) {
+        this->levelManager = levelManager;
+    }
 
-    virtual TileKind getKind() { return tileKind; }
+    virtual bool put(FoodContainer &container) { return false; }
+    virtual FoodContainer pick() {
+        return FoodContainer(ContainerKind::None);
+    }
+    virtual bool interact() { return false; }
+    virtual FoodContainer *getContainer() {
+        return nullptr;
+    }
+
+    TileKind getTileKind() const { return tileKind; }
 
   protected:
     b2Vec2 position;
     TileKind tileKind = TileKind::None;
+    GameManager *levelManager = nullptr;
 };
 
 class TileVoid : public Tile {
@@ -56,26 +63,117 @@ class TileWall : public Tile {
         shape.SetAsBox(0.5f, 0.5f);
         body->CreateFixture(&shape, 0.0f);
 
-        setUserData(EntityKind::Wall);
+        setUserData(BodyKind::Wall);
     }
 };
 
 class TileTable : public TileWall {
   public:
     TileTable() { tileKind = TileKind::Table; }
+
+    virtual bool put(FoodContainer &container) override {
+        return containerOnTable.put(container);
+    }
+
+    virtual FoodContainer pick() override {
+        return std::move(containerOnTable);
+    }
+
+    virtual FoodContainer *getContainer() override {
+        return &containerOnTable;
+    }
+
+    void setContainer(FoodContainer &&container) {
+        containerOnTable = std::move(container);
+    }
+
+  protected:
+    FoodContainer containerOnTable;
 };
 
-inline Tile *CreateTile(char kind) {
+class TilePantry : public TileTable {
+  public:
+    TilePantry() { tileKind = TileKind::Pantry; }
+
+    void setIngredient(std::string ingredient) {
+        this->ingredient = ingredient;
+    }
+
+    FoodContainer pick() override {
+        auto container = TileTable::pick();
+        if (container.isNull()) {
+            container =
+                FoodContainer(ContainerKind::None, Mixture(ingredient));
+        }
+        return std::move(container);
+    }
+
+  protected:
+    std::string ingredient;
+};
+
+class TileCuttingBoard : public TileTable {
+  public:
+    TileCuttingBoard() { tileKind = TileKind::CuttingBoard; }
+
+    bool put(FoodContainer &container) override {
+        if (containerOnTable.isWorking()) {
+            return false;
+        }
+        return TileTable::put(container);
+    }
+
+    FoodContainer pick() override {
+        if (containerOnTable.isWorking()) {
+            return FoodContainer(ContainerKind::None);
+        }
+        return TileTable::pick();
+    }
+
+    bool interact() override;
+};
+
+class TileServingHatch : public TileWall {
+  public:
+    TileServingHatch() { tileKind = TileKind::ServingHatch; }
+
+    bool put(FoodContainer &container) override {
+        if (container.getContainerKind() != ContainerKind::Dish) {
+            return false;
+        }
+        container = FoodContainer();
+        return true;
+    }
+};
+
+class TileDishTable : public TileWall {
+  public:
+    TileDishTable() { tileKind = TileKind::DishTable; }
+
+    FoodContainer pick() override {
+        return FoodContainer(ContainerKind::Dish);
+    }
+};
+
+inline Tile *CreateTile(TileKind kind) {
     switch (kind) {
-    case ' ':
+    case TileKind::Void:
         return new TileVoid();
-    case '.':
+    case TileKind::Floor:
         return new TileFloor();
-    case '*':
+    case TileKind::Wall:
+        return new TileWall();
+    case TileKind::Table:
         return new TileTable();
+    case TileKind::CuttingBoard:
+        return new TileCuttingBoard();
+    case TileKind::ServingHatch:
+        return new TileServingHatch();
+    case TileKind::Pantry:
+        return new TilePantry();
+    case TileKind::DishTable:
+        return new TileDishTable();
     default:
-        return new Tile();
+        throw "Unexpected tile kind";
     }
 }
-
-#endif // TILE_H_

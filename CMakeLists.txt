@@ -24,10 +24,11 @@ set(PROJECT_SOURCES
 
         config.h
         interfaces.h
-        gamescene.h
+        tile.h tile.cpp
         player.h player.cpp
-        tile.h
-        levelmanager.h
+        mixture.h recipe.h foodcontainer.h
+        gamemanager.h
+        guimanager.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

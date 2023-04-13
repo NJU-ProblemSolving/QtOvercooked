@@ -9,23 +9,23 @@ class IUpdatable {
     virtual void lateUpdate() {}
 };
 
-enum class EntityKind {
+enum class BodyKind {
     Unknown,
     Player,
     Wall,
 };
 
-class IEntity {
+class IBody {
   public:
     b2Body *getBody() { return body; }
-    EntityKind getEntityKind() { return entityKind; }
+    BodyKind getBodyKind() { return bodyKind; }
 
   protected:
     b2Body *body;
-    EntityKind entityKind = EntityKind::Unknown;
+    BodyKind bodyKind = BodyKind::Unknown;
 
-    void setUserData(EntityKind kind) {
-        entityKind = kind;
+    void setUserData(BodyKind kind) {
+        bodyKind = kind;
         body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
     }
 };

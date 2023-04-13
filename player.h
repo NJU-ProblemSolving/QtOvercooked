@@ -6,14 +6,15 @@
 
 #include "config.h"
 #include "interfaces.h"
+#include "tile.h"
 
-class LevelManager;
+class GameManager;
 
-class Player : public IUpdatable, public IEntity {
+class Player : public IUpdatable, public IBody {
   public:
-    Player() { entityKind = EntityKind::Player; }
+    Player() { bodyKind = BodyKind::Player; }
 
-    void setLevelManager(LevelManager *levelManager) {
+    void setLevelManager(GameManager *levelManager) {
         this->levelManager = levelManager;
     }
     void setSpawnPoint(b2Vec2 point) { spawnPoint = point; }
@@ -31,7 +32,7 @@ class Player : public IUpdatable, public IEntity {
         fixtureDef.density = 1.0f;
         body->CreateFixture(&fixtureDef);
 
-        setUserData(EntityKind::Player);
+        setUserData(BodyKind::Player);
     }
 
     void move(b2Vec2 direction) {
@@ -67,19 +68,43 @@ class Player : public IUpdatable, public IEntity {
         }
     }
 
-    void update() override {}
+    void pickOrPut(Tile *tile) {
+        if (respawnCountdown > 0) {
+            return;
+        }
+
+        if (!onHand.isNull()) {
+            tile->put(onHand);
+        } else {
+            onHand = tile->pick();
+        }
+    }
+
+    void interact(Tile *tile) {
+        if (respawnCountdown > 0) {
+            return;
+        }
+
+        if (!onHand.isNull()) {
+            return;
+        }
+
+        tileInteracting = tile;
+    }
 
     void lateUpdate() override;
 
-    void collision(IEntity *entity) {
-        qDebug() << "Player collided with entity";
-    }
+    void collision(IBody *entity) { qDebug() << "Player collided with entity"; }
+
+    FoodContainer *getOnHand() { return &onHand; }
 
   protected:
+    GameManager *levelManager;
+    b2Vec2 spawnPoint;
     int respawnCountdown = 0;
 
-    b2Vec2 spawnPoint;
-    LevelManager *levelManager;
+    FoodContainer onHand;
+    Tile *tileInteracting = nullptr;
 };
 
 #endif

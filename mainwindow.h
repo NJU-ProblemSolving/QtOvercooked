@@ -6,7 +6,7 @@
 #include <QMainWindow>
 #include <QTimer>
 
-#include "gamescene.h"
+#include "guimanager.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -23,7 +23,7 @@ class MainWindow : public QMainWindow {
 
   private:
     Ui::MainWindow *ui;
-    GameScene *gameScene;
+    GuiManager *guiManager;
     QTimer *updateTimer;
 };
 #endif // MAINWINDOW_H_
