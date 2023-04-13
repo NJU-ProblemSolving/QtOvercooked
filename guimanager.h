@@ -107,6 +107,7 @@ class GuiTile : public GuiItem {
             graphicsItem->setZValue(1);
             auto text =
                 new QGraphicsTextItem(QString(getAbbrev(kind)), graphicsItem);
+            text->setPos(0, 0.4 * SCALE);
             break;
         }
         auto foodContainer = tile->getContainer();

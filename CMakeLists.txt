@@ -23,7 +23,7 @@ set(PROJECT_SOURCES
         mainwindow.ui
 
         config.h
-        interfaces.h
+        interfaces.h enums.h
         tile.h tile.cpp
         player.h player.cpp
         mixture.h recipe.h foodcontainer.h

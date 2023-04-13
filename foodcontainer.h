@@ -49,26 +49,47 @@ class FoodContainer {
         this->mixture = mixture;
         propertyChanged = true;
     }
-    bool put(FoodContainer &container) {
+    bool put(FoodContainer &other) {
         if (this->containerKind == ContainerKind::DirtyDish) {
             return false;
         }
-        if (this->containerKind != ContainerKind::None) {
-            this->mixture.put(container.mixture);
+        // self 有容器，且 other 有食材：将 other 倒入 self
+        if (this->containerKind != ContainerKind::None &&
+            !other.mixture.isEmpty()) {
+            if (other.isWorking()) {
+                return false;
+            }
+            this->mixture.put(other.mixture);
             this->recipe = nullptr;
             propertyChanged = true;
-            container.propertyChanged = true;
+            other.propertyChanged = true;
             return true;
         }
-        if (container.containerKind != ContainerKind::None) {
-            container.put(*this);
-            *this = std::move(container);
+        // self 有容器，但 other 没有食材：尝试从 self 倒入 other
+        if (this->containerKind != ContainerKind::None &&
+            other.mixture.isEmpty()) {
+            if (this->mixture.isEmpty() || this->isWorking()) {
+                return false;
+            }
+            if (other.isNull()) {
+                return false;
+            }
+            return other.put(*this);
+        }
+        assert(this->containerKind == ContainerKind::None);
+        // self 没有容器，但 other 有容器：尝试从 self 倒入 other，并将 other
+        // 给予 self
+        if (other.containerKind != ContainerKind::None) {
+            other.put(*this);
+            *this = std::move(other);
             return true;
         }
+        // self 没有容器，other 也没有容器：在 self 为空的情况下将 other 给予
+        // self
         if (!this->mixture.isEmpty()) {
             return false;
         }
-        *this = std::move(container);
+        *this = std::move(other);
         return true;
     }
 

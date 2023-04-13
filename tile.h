@@ -125,6 +125,13 @@ class TileCuttingBoard : public TileTable {
     bool interact() override;
 };
 
+class TileStove : public TileTable, public IUpdatable {
+  public:
+    TileStove() { tileKind = TileKind::Stove; }
+
+    void lateUpdate() override;
+};
+
 class TileServingHatch : public TileWall {
   public:
     TileServingHatch() { tileKind = TileKind::ServingHatch; }
@@ -133,7 +140,8 @@ class TileServingHatch : public TileWall {
         if (container.getContainerKind() != ContainerKind::Dish) {
             return false;
         }
-        container = FoodContainer();
+        FoodContainer nullContainer;
+        nullContainer.put(container);
         return true;
     }
 };
@@ -157,6 +165,8 @@ inline Tile *CreateTile(TileKind kind) {
         return new TileTable();
     case TileKind::CuttingBoard:
         return new TileCuttingBoard();
+    case TileKind::Stove:
+        return new TileStove();
     case TileKind::ServingHatch:
         return new TileServingHatch();
     case TileKind::Pantry:

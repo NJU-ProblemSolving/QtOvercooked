@@ -22,3 +22,23 @@ bool TileCuttingBoard::interact() {
     containerOnTable.step(tileKind);
     return true;
 }
+
+void TileStove::lateUpdate() {
+    if (containerOnTable.isNull()) {
+        return;
+    }
+
+    if (!containerOnTable.isWorking()) {
+        for (auto &recipe : levelManager->getRecipes()) {
+            if (containerOnTable.matchRecipe(&recipe)) {
+                containerOnTable.setRecipe(&recipe);
+            }
+        }
+    }
+
+    if (!containerOnTable.isWorking()) {
+        return;
+    }
+
+    containerOnTable.step(tileKind);
+}

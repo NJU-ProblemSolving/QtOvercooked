@@ -59,11 +59,11 @@ inline char getAbbrev(TileKind kind) {
     case TileKind::CuttingBoard:
         return 'c';
     case TileKind::ServingHatch:
-        return 's';
+        return '$';
     case TileKind::WashBowl:
         return 'w';
     case TileKind::Stove:
-        return 'a';
+        return 's';
     case TileKind::Trashbin:
         return 't';
     case TileKind::DishTable:
