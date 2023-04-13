@@ -20,8 +20,9 @@ void Player::lateUpdate() {
     }
 
     if (tileInteracting != nullptr) {
-        auto distance =
-            (body->GetPosition() - tileInteracting->getPos() - b2Vec2(0.5f, 0.5f)).Length();
+        auto distance = (body->GetPosition() - tileInteracting->getPos() -
+                         b2Vec2(0.5f, 0.5f))
+                            .Length();
         if (distance > PLAYER_INTERACT_DISTANCE) {
             tileInteracting = nullptr;
         }

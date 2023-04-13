@@ -19,7 +19,8 @@ class GuiItem {
 
 class GuiFoodContainer : public GuiItem {
   public:
-    GuiFoodContainer(FoodContainer *foodContainer, QGraphicsItem *parentItem = nullptr)
+    GuiFoodContainer(FoodContainer *foodContainer,
+                     QGraphicsItem *parentItem = nullptr)
         : foodContainer(foodContainer) {
         // Set text alignment to center
         graphicsItem = new QGraphicsTextItem(parentItem);
@@ -61,13 +62,14 @@ class GuiPlayer : public GuiItem {
         graphicsItem = new QGraphicsEllipseItem(0, 0, PLAYER_RADIUS * 2 * SCALE,
                                                 PLAYER_RADIUS * 2 * SCALE);
         graphicsItem->setZValue(10);
-        guiFoodContainer = new GuiFoodContainer(player->getOnHand(), graphicsItem);
+        guiFoodContainer =
+            new GuiFoodContainer(player->getOnHand(), graphicsItem);
     }
 
     void update() override {
         auto pos = player->getBody()->GetPosition();
         graphicsItem->setPos((pos.x - PLAYER_RADIUS) * SCALE,
-                  (pos.y - PLAYER_RADIUS) * SCALE);
+                             (pos.y - PLAYER_RADIUS) * SCALE);
         guiFoodContainer->update();
     }
 
@@ -82,9 +84,9 @@ class GuiPlayer : public GuiItem {
 class GuiTile : public GuiItem {
   public:
     GuiTile(Tile *tile) : tile(tile) {
-        graphicsItem = new QGraphicsRectItem(0, 0,
-                                          SCALE, SCALE);
-        graphicsItem->setPos(tile->getPos().x * SCALE, tile->getPos().y * SCALE);
+        graphicsItem = new QGraphicsRectItem(0, 0, SCALE, SCALE);
+        graphicsItem->setPos(tile->getPos().x * SCALE,
+                             tile->getPos().y * SCALE);
         auto kind = tile->getTileKind();
         switch (kind) {
         case TileKind::Void:
@@ -103,12 +105,14 @@ class GuiTile : public GuiItem {
         default:
             graphicsItem->setPen(QPen(Qt::black));
             graphicsItem->setZValue(1);
-            auto text = new QGraphicsTextItem(QString(getAbbrev(kind)), graphicsItem);
+            auto text =
+                new QGraphicsTextItem(QString(getAbbrev(kind)), graphicsItem);
             break;
         }
         auto foodContainer = tile->getContainer();
-        if (foodContainer!=nullptr) {
-            guiFoodContainer = new GuiFoodContainer(foodContainer, graphicsItem);
+        if (foodContainer != nullptr) {
+            guiFoodContainer =
+                new GuiFoodContainer(foodContainer, graphicsItem);
         }
     }
 
@@ -148,7 +152,7 @@ class GuiManager final : public QGraphicsScene {
         }
     }
 
-public slots:
+  public slots:
     void step() {
         {
             static int lastMove = 1;

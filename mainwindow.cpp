@@ -22,8 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
     updateTimer = new QTimer(this);
     auto time = new QElapsedTimer();
     updateTimer->setInterval(1000.0f / FPS);
-    connect(updateTimer, &QTimer::timeout, guiManager,
-            &GuiManager::step);
+    connect(updateTimer, &QTimer::timeout, guiManager, &GuiManager::step);
     updateTimer->start();
 }
 

@@ -8,7 +8,6 @@
 #include "mixture.h"
 #include "recipe.h"
 
-
 class GameManager;
 
 class Tile : public IBody {
@@ -24,13 +23,9 @@ class Tile : public IBody {
     }
 
     virtual bool put(FoodContainer &container) { return false; }
-    virtual FoodContainer pick() {
-        return FoodContainer(ContainerKind::None);
-    }
+    virtual FoodContainer pick() { return FoodContainer(ContainerKind::None); }
     virtual bool interact() { return false; }
-    virtual FoodContainer *getContainer() {
-        return nullptr;
-    }
+    virtual FoodContainer *getContainer() { return nullptr; }
 
     TileKind getTileKind() const { return tileKind; }
 
@@ -79,9 +74,7 @@ class TileTable : public TileWall {
         return std::move(containerOnTable);
     }
 
-    virtual FoodContainer *getContainer() override {
-        return &containerOnTable;
-    }
+    virtual FoodContainer *getContainer() override { return &containerOnTable; }
 
     void setContainer(FoodContainer &&container) {
         containerOnTable = std::move(container);
@@ -102,8 +95,7 @@ class TilePantry : public TileTable {
     FoodContainer pick() override {
         auto container = TileTable::pick();
         if (container.isNull()) {
-            container =
-                FoodContainer(ContainerKind::None, Mixture(ingredient));
+            container = FoodContainer(ContainerKind::None, Mixture(ingredient));
         }
         return std::move(container);
     }
@@ -150,9 +142,7 @@ class TileDishTable : public TileWall {
   public:
     TileDishTable() { tileKind = TileKind::DishTable; }
 
-    FoodContainer pick() override {
-        return FoodContainer(ContainerKind::Dish);
-    }
+    FoodContainer pick() override { return FoodContainer(ContainerKind::Dish); }
 };
 
 inline Tile *CreateTile(TileKind kind) {

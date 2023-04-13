@@ -2,14 +2,15 @@
 
 #include <string>
 
+#include "enums.h"
 #include "interfaces.h"
 #include "mixture.h"
 #include "recipe.h"
-#include "enums.h"
 
 class FoodContainer {
   public:
-    FoodContainer(ContainerKind kind = ContainerKind::None, const Mixture &mixture = Mixture())
+    FoodContainer(ContainerKind kind = ContainerKind::None,
+                  const Mixture &mixture = Mixture())
         : containerKind(kind), mixture(mixture) {}
 
     FoodContainer(const FoodContainer &other) = delete;
@@ -24,7 +25,8 @@ class FoodContainer {
     }
     FoodContainer &operator=(const FoodContainer &other) = delete;
     FoodContainer &operator=(FoodContainer &&other) {
-        if (this->containerKind != ContainerKind::None || !this->mixture.isEmpty()) {
+        if (this->containerKind != ContainerKind::None ||
+            !this->mixture.isEmpty()) {
             throw std::runtime_error("Cannot move to non-empty container");
         }
         containerKind = other.containerKind;
@@ -38,10 +40,15 @@ class FoodContainer {
         return *this;
     }
 
-    bool isNull() { return containerKind == ContainerKind::None && mixture.isEmpty(); }
+    bool isNull() {
+        return containerKind == ContainerKind::None && mixture.isEmpty();
+    }
     ContainerKind getContainerKind() { return containerKind; }
     const Mixture &getMixture() { return mixture; }
-    void setMixture(const Mixture &mixture) { this->mixture = mixture; propertyChanged = true; }
+    void setMixture(const Mixture &mixture) {
+        this->mixture = mixture;
+        propertyChanged = true;
+    }
     bool put(FoodContainer &container) {
         if (this->containerKind == ContainerKind::DirtyDish) {
             return false;
@@ -68,17 +75,21 @@ class FoodContainer {
     bool isPropertyChanged() { return propertyChanged; }
     void setPropertyChanged(bool value) { propertyChanged = value; }
 
-    bool isWorking() { return recipe!=nullptr; }
+    bool isWorking() { return recipe != nullptr; }
     bool matchRecipe(const Recipe *recipe) {
-        return containerKind == recipe->containerKind && mixture == recipe->ingredients;
+        return containerKind == recipe->containerKind &&
+               mixture == recipe->ingredients;
     }
-    void setRecipe(const Recipe *recipe) { this->recipe = recipe;progress=0; }
+    void setRecipe(const Recipe *recipe) {
+        this->recipe = recipe;
+        progress = 0;
+    }
     float getProgress() { return (float)progress / this->recipe->time; }
     void step(TileKind tileKind) {
         if (tileKind != recipe->tileKind) {
             return;
         }
-        progress ++;
+        progress++;
         propertyChanged = true;
         if (progress >= recipe->time) {
             setMixture(recipe->result);

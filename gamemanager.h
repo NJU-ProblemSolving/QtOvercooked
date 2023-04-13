@@ -70,7 +70,8 @@ class GameManager {
                 results.add(s);
             }
 
-            recipes.push_back(Recipe(ingredients, results, containerKind, tileKind, time));
+            recipes.push_back(
+                Recipe(ingredients, results, containerKind, tileKind, time));
         }
 
         in >> width >> height;
@@ -85,11 +86,13 @@ class GameManager {
             switch (kindChar) {
             case 'a':
                 addTile(i, kindChar);
-                static_cast<TileTable*>(map[i])->setContainer(ContainerKind::Pan);
+                static_cast<TileTable *>(map[i])->setContainer(
+                    ContainerKind::Pan);
                 break;
             case 'o':
                 addTile(i, kindChar);
-                static_cast<TileTable*>(map[i])->setContainer(ContainerKind::Pot);
+                static_cast<TileTable *>(map[i])->setContainer(
+                    ContainerKind::Pot);
                 break;
             default:
                 if (kindChar >= 'A' && kindChar <= 'Z') {
