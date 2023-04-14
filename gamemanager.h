@@ -14,8 +14,10 @@
 
 #include "collisionlisener.h"
 #include "config.h"
+#include "entitymanager.h"
 #include "foodcontainer.h"
 #include "interfaces.h"
+#include "ordermanager.h"
 #include "player.h"
 #include "recipe.h"
 #include "tile.h"
@@ -29,6 +31,43 @@ class GameManager {
         world->SetContactListener(new CollisionListener());
 
         std::ifstream in(path);
+
+        in >> width >> height;
+        map.resize(width * height);
+        in >> std::noskipws;
+        for (int i = 0; i < width * height; i++) {
+            char kindChar;
+            do {
+                in >> kindChar;
+            } while (kindChar == '\n' || kindChar == '\r');
+
+            if (kindChar >= 'A' && kindChar <= 'Z') {
+                map[i] = nullptr;
+            } else {
+                addTile(i, kindChar);
+            }
+        }
+        in >> std::skipws;
+
+        int illustrationCount;
+        in >> illustrationCount;
+        for (int i = 0; i < illustrationCount; i++) {
+            std::string s;
+            int x, y;
+            in >> s >> x >> y;
+            int pos = y * width + x;
+            if (s == "Pantry") {
+                std::string ingredient;
+                int price;
+                in >> ingredient >> price;
+                assert(map[pos] == nullptr);
+                addTile(pos, 'p');
+                auto pantry = static_cast<TilePantry *>(map[pos]);
+                pantry->init(ingredient, price);
+            } else {
+                throw std::runtime_error("Invalid illustration");
+            }
+        }
 
         int recipeCount;
         in >> recipeCount;
@@ -54,14 +93,14 @@ class GameManager {
             if (s == "-cut->") {
                 containerKind = ContainerKind::None;
                 tileKind = TileKind::CuttingBoard;
-            } else if (s == "-pod->") {
+            } else if (s == "-pot->") {
                 containerKind = ContainerKind::Pot;
                 tileKind = TileKind::Stove;
             } else if (s == "-pan->") {
                 containerKind = ContainerKind::Pan;
                 tileKind = TileKind::Stove;
             } else {
-                throw "Unknown recipe kind";
+                throw std::runtime_error("Invalid recipe");
             }
 
             Mixture results;
@@ -74,45 +113,66 @@ class GameManager {
                 Recipe(ingredients, results, containerKind, tileKind, time));
         }
 
-        in >> width >> height;
-        map.resize(width * height);
-        in >> std::noskipws;
-        for (int i = 0; i < width * height; i++) {
-            char kindChar;
+        int totalTime, randomizeSeed, orderTemplateCount;
+        in >> totalTime >> randomizeSeed >> orderTemplateCount;
+        orderManager.setTimeCountdown(totalTime);
+        for (int i = 0; i < orderTemplateCount; i++) {
+            std::string s;
             do {
-                in >> kindChar;
-            } while (kindChar == '\n' || kindChar == '\r');
+                getline(in, s);
+            } while (s.length() == 0);
+            std::stringstream ss(s);
 
-            switch (kindChar) {
-            case 'a':
-                addTile(i, kindChar);
-                static_cast<TileTable *>(map[i])->setContainer(
-                    ContainerKind::Pan);
-                break;
-            case 'o':
-                addTile(i, kindChar);
-                static_cast<TileTable *>(map[i])->setContainer(
-                    ContainerKind::Pot);
-                break;
-            default:
-                if (kindChar >= 'A' && kindChar <= 'Z') {
-                    addTile(i, kindChar);
-                    static_cast<TilePantry *>(map[i])->setIngredient(
-                        std::string{kindChar});
-                } else {
-                    addTile(i, kindChar);
-                }
-                break;
+            int time, price, weight;
+            ss >> time >> price >> weight;
+
+            Mixture ingredients;
+            while (ss.good()) {
+                ss >> s;
+                ingredients.add(s);
             }
-        }
-        in >> std::skipws;
 
-        int playerCount;
-        in >> playerCount;
-        for (int i = 0; i < playerCount; i++) {
+            orderManager.addOrderTemplates(
+                OrderTemplate(ingredients, price, time, weight));
+        }
+        for (int i = 0; i < 4; i++) {
+            orderManager.generateOrder();
+        }
+
+        int entityCount;
+        in >> entityCount;
+        entityManager.setGameManager(this);
+        for (int i = 0; i < entityCount; i++) {
+            std::string s;
             int x, y;
-            in >> x >> y;
-            addPlayer(x, y);
+            in >> s >> x >> y;
+            int pos = y * width + x;
+            if (s == "Player") {
+                assert(map[pos]->getTileKind() == TileKind::Floor);
+                addPlayer(x, y);
+            } else if (s == "Pot") {
+                //            assert(map[pos]->getTileKind() ==
+                //            TileKind::Table);
+                auto table = static_cast<TileTable *>(map[pos]);
+                auto pot = ContainerHolder(ContainerKind::Pot, Mixture());
+                pot.setRespawnPoint(std::make_pair(x, y));
+                table->put(pot);
+            } else if (s == "Pan") {
+                //            assert(map[pos]->getTileKind() ==
+                //            TileKind::Table);
+                auto table = static_cast<TileTable *>(map[pos]);
+                auto pan = ContainerHolder(ContainerKind::Pan, Mixture());
+                pan.setRespawnPoint(std::make_pair(x, y));
+                table->put(pan);
+            } else if (s == "Dish") {
+                assert(map[pos]->getTileKind() == TileKind::Table);
+                auto table = static_cast<TileTable *>(map[pos]);
+                auto dish = ContainerHolder(ContainerKind::Dish, Mixture());
+                dish.setRespawnPoint(std::make_pair(x, y));
+                table->put(dish);
+            } else {
+                throw std::runtime_error("Unknown entity kind");
+            }
         }
 
         in.close();
@@ -130,6 +190,8 @@ class GameManager {
         for (auto &i : updateList) {
             i->lateUpdate();
         }
+        orderManager.step();
+        entityManager.step();
     }
 
     const b2World *getWorld() { return world; }
@@ -144,18 +206,23 @@ class GameManager {
     const std::vector<Player *> &getPlayers() { return players; }
     const std::vector<Tile *> &getTiles() { return map; }
     const std::vector<Recipe> &getRecipes() { return recipes; }
+    const std::vector<Order> &getOrders() { return orderManager.getOrders(); }
+
+    friend class GuiManager;
+    friend class TileServingHatch;
 
   protected:
-    friend class GuiManager;
-
     b2World *world;
 
     int width;
     int height;
-    std::vector<IUpdatable *> updateList;
     std::vector<Player *> players;
     std::vector<Tile *> map;
     std::vector<Recipe> recipes;
+    OrderManager orderManager;
+    EntityManager entityManager;
+
+    std::vector<IUpdatable *> updateList;
 
     void addPlayer(int x, int y) {
         auto player = new Player();
@@ -172,7 +239,7 @@ class GameManager {
         map[i] = CreateTile(kind);
         map[i]->setPos(b2Vec2(i % width, i / width));
         map[i]->initB2(world);
-        map[i]->setLevelManager(this);
+        map[i]->setGameManager(this);
 
         auto iUpdatable = dynamic_cast<IUpdatable *>(map[i]);
         if (iUpdatable != nullptr) {

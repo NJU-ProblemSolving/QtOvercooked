@@ -6,7 +6,6 @@
 #include "foodcontainer.h"
 #include "interfaces.h"
 #include "mixture.h"
-#include "recipe.h"
 
 class GameManager;
 
@@ -18,21 +17,21 @@ class Tile : public IBody {
     void setPos(b2Vec2 position) { this->position = position; }
 
     virtual void initB2(b2World *world) {}
-    void setLevelManager(GameManager *levelManager) {
-        this->levelManager = levelManager;
+    void setGameManager(GameManager *levelManager) {
+        this->gameManager = levelManager;
     }
 
-    virtual bool put(FoodContainer &container) { return false; }
-    virtual FoodContainer pick() { return FoodContainer(ContainerKind::None); }
+    virtual bool put(ContainerHolder &container) { return false; }
+    virtual ContainerHolder pick() { return ContainerHolder(); }
     virtual bool interact() { return false; }
-    virtual FoodContainer *getContainer() { return nullptr; }
+    virtual ContainerHolder *getContainer() { return nullptr; }
 
     TileKind getTileKind() const { return tileKind; }
 
   protected:
-    b2Vec2 position;
+    b2Vec2 position{};
     TileKind tileKind = TileKind::None;
-    GameManager *levelManager = nullptr;
+    GameManager *gameManager = nullptr;
 };
 
 class TileVoid : public Tile {
@@ -66,61 +65,63 @@ class TileTable : public TileWall {
   public:
     TileTable() { tileKind = TileKind::Table; }
 
-    virtual bool put(FoodContainer &container) override {
+    virtual bool put(ContainerHolder &container) override {
         return containerOnTable.put(container);
     }
 
-    virtual FoodContainer pick() override {
+    virtual ContainerHolder pick() override {
         return std::move(containerOnTable);
     }
 
-    virtual FoodContainer *getContainer() override { return &containerOnTable; }
+    virtual ContainerHolder *getContainer() override {
+        return &containerOnTable;
+    }
 
-    void setContainer(FoodContainer &&container) {
+    void setContainer(ContainerHolder &&container) {
         containerOnTable = std::move(container);
     }
 
   protected:
-    FoodContainer containerOnTable;
+    ContainerHolder containerOnTable;
 };
 
 class TilePantry : public TileTable {
   public:
     TilePantry() { tileKind = TileKind::Pantry; }
 
-    void setIngredient(std::string ingredient) {
+    std::string getIngredient() { return ingredient; }
+    void init(std::string ingredient, int price) {
         this->ingredient = ingredient;
+        this->price = price;
     }
 
-    FoodContainer pick() override {
+    ContainerHolder pick() override {
         auto container = TileTable::pick();
         if (container.isNull()) {
-            container = FoodContainer(ContainerKind::None, Mixture(ingredient));
+            container =
+                ContainerHolder(ContainerKind::None, Mixture(ingredient));
         }
         return std::move(container);
     }
 
   protected:
     std::string ingredient;
+    int price;
+};
+
+class TileTrashbin : public TileWall {
+  public:
+    TileTrashbin() { tileKind = TileKind::Trashbin; }
+
+    bool put(ContainerHolder &container) override {
+        container.setMixture(Mixture());
+        return true;
+    }
 };
 
 class TileCuttingBoard : public TileTable {
   public:
     TileCuttingBoard() { tileKind = TileKind::CuttingBoard; }
-
-    bool put(FoodContainer &container) override {
-        if (containerOnTable.isWorking()) {
-            return false;
-        }
-        return TileTable::put(container);
-    }
-
-    FoodContainer pick() override {
-        if (containerOnTable.isWorking()) {
-            return FoodContainer(ContainerKind::None);
-        }
-        return TileTable::pick();
-    }
 
     bool interact() override;
 };
@@ -136,21 +137,17 @@ class TileServingHatch : public TileWall {
   public:
     TileServingHatch() { tileKind = TileKind::ServingHatch; }
 
-    bool put(FoodContainer &container) override {
-        if (container.getContainerKind() != ContainerKind::Dish) {
-            return false;
-        }
-        FoodContainer nullContainer;
-        nullContainer.put(container);
-        return true;
-    }
+    bool put(ContainerHolder &container) override;
 };
 
-class TileDishTable : public TileWall {
+class TileDishTable : public TileTable {
   public:
     TileDishTable() { tileKind = TileKind::DishTable; }
+};
 
-    FoodContainer pick() override { return FoodContainer(ContainerKind::Dish); }
+class TileDirtyDishTable : public TileTable {
+  public:
+    TileDirtyDishTable() { tileKind = TileKind::DirtyDishTable; }
 };
 
 inline Tile *CreateTile(TileKind kind) {
@@ -163,6 +160,8 @@ inline Tile *CreateTile(TileKind kind) {
         return new TileWall();
     case TileKind::Table:
         return new TileTable();
+    case TileKind::Trashbin:
+        return new TileTrashbin();
     case TileKind::CuttingBoard:
         return new TileCuttingBoard();
     case TileKind::Stove:
@@ -173,7 +172,9 @@ inline Tile *CreateTile(TileKind kind) {
         return new TilePantry();
     case TileKind::DishTable:
         return new TileDishTable();
+    case TileKind::DirtyDishTable:
+        return new TileDirtyDishTable();
     default:
-        throw "Unexpected tile kind";
+        throw std::runtime_error("Unknown tile kind");
     }
 }

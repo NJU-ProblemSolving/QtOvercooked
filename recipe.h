@@ -3,6 +3,7 @@
 
 #include <algorithm>
 
+#include "config.h"
 #include "enums.h"
 #include "mixture.h"
 
@@ -20,5 +21,7 @@ class Recipe {
     TileKind tileKind;
     int time;
 };
+
+extern Recipe GeneralCookRecipe;
 
 #endif

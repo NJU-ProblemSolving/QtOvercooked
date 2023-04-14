@@ -15,6 +15,7 @@ void Player::lateUpdate() {
     if (tile->getTileKind() == TileKind::Void) {
         body->SetTransform(spawnPoint, 0);
         body->SetLinearVelocity(b2Vec2(0, 0));
+        body->SetEnabled(false);
         respawnCountdown = PLAYER_RESPAWN_TIME;
         tileInteracting = nullptr;
     }

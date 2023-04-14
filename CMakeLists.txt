@@ -26,8 +26,10 @@ set(PROJECT_SOURCES
         interfaces.h enums.h
         tile.h tile.cpp
         player.h player.cpp
-        mixture.h recipe.h foodcontainer.h
-        gamemanager.h
+        recipe.h recipe.cpp
+        mixture.h foodcontainer.h
+        entitymanager.h entitymanager.cpp
+        ordermanager.h gamemanager.h
         guimanager.h
 )
 

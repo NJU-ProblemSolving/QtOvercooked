@@ -94,16 +94,16 @@ class Player : public IUpdatable, public IBody {
 
     void lateUpdate() override;
 
-    void collision(IBody *entity) { qDebug() << "Player collided with entity"; }
+    void collision(IBody *entity) { if (!onHand.isEmpty()) { onHand.setCollided(); } }
 
-    FoodContainer *getOnHand() { return &onHand; }
+    ContainerHolder *getOnHand() { return &onHand; }
 
   protected:
     GameManager *levelManager;
     b2Vec2 spawnPoint;
     int respawnCountdown = 0;
 
-    FoodContainer onHand;
+    ContainerHolder onHand;
     Tile *tileInteracting = nullptr;
 };
 

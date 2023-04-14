@@ -5,8 +5,6 @@
 #include <string>
 #include <vector>
 
-#include "interfaces.h"
-
 class Mixture {
   public:
     Mixture() {}
@@ -16,7 +14,7 @@ class Mixture {
         std::sort(this->ingredients.begin(), this->ingredients.end());
     }
 
-    bool isEmpty() { return ingredients.size() == 0; }
+    bool isEmpty() const { return ingredients.size() == 0; }
     const std::vector<std::string> &getIngredients() { return ingredients; }
 
     void add(const std::string &ingredient) {

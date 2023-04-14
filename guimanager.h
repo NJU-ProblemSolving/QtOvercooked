@@ -19,7 +19,7 @@ class GuiItem {
 
 class GuiFoodContainer : public GuiItem {
   public:
-    GuiFoodContainer(FoodContainer *foodContainer,
+    GuiFoodContainer(ContainerHolder *foodContainer,
                      QGraphicsItem *parentItem = nullptr)
         : foodContainer(foodContainer) {
         // Set text alignment to center
@@ -31,19 +31,29 @@ class GuiFoodContainer : public GuiItem {
         progress->setPen(Qt::NoPen);
         progress->setZValue(1);
         progress->setVisible(false);
+        overcookProgress = new QGraphicsRectItem(graphicsItem);
+        overcookProgress->setPos(0, SCALE * 0.8);
+        overcookProgress->setBrush(QBrush(Qt::red));
+        overcookProgress->setPen(Qt::NoPen);
+        overcookProgress->setZValue(2);
+        overcookProgress->setVisible(false);
     }
 
     void update() override {
         if (foodContainer->isPropertyChanged()) {
-            foodContainer->setPropertyChanged(false);
             graphicsItem->setPlainText(
                 QString::fromStdString(foodContainer->toString()));
             if (foodContainer->isWorking()) {
                 progress->setVisible(true);
                 progress->setRect(0, 0, SCALE * foodContainer->getProgress(),
                                   SCALE * 0.2);
+                overcookProgress->setVisible(true);
+                overcookProgress->setRect(
+                    0, 0, SCALE * foodContainer->getOvercookProgress(),
+                    SCALE * 0.2);
             } else {
                 progress->setVisible(false);
+                overcookProgress->setVisible(false);
             }
         }
     }
@@ -51,9 +61,10 @@ class GuiFoodContainer : public GuiItem {
     QGraphicsItem *getGraphicsItem() override { return graphicsItem; }
 
   protected:
-    FoodContainer *foodContainer;
+    ContainerHolder *foodContainer;
     QGraphicsTextItem *graphicsItem;
     QGraphicsRectItem *progress;
+    QGraphicsRectItem *overcookProgress;
 };
 
 class GuiPlayer : public GuiItem {
@@ -107,6 +118,11 @@ class GuiTile : public GuiItem {
             graphicsItem->setZValue(1);
             auto text =
                 new QGraphicsTextItem(QString(getAbbrev(kind)), graphicsItem);
+            if (kind == TileKind::Pantry) {
+                auto pantry = static_cast<TilePantry *>(tile);
+                text->setPlainText(
+                    QString::fromStdString(pantry->getIngredient()));
+            }
             text->setPos(0, 0.4 * SCALE);
             break;
         }
@@ -130,6 +146,32 @@ class GuiTile : public GuiItem {
     GuiFoodContainer *guiFoodContainer = nullptr;
 };
 
+class GuiOrder : public GuiItem {
+    public:
+        GuiOrder(OrderManager *orderManager) : orderManager(orderManager) {
+            graphicsItem = new QGraphicsTextItem();
+            graphicsItem->setPos(-150, 0);
+        }
+    
+        void update() override {
+            std::stringstream ss;
+            ss << "Frame: " << orderManager->getFrame() << '\n';
+            ss << "Fund: " << orderManager->getFund() << '\n';
+            ss << "Remain: " << orderManager->getTimeCountdown() << '\n';
+            for (auto &order : orderManager->getOrders()) {
+            ss << order.time << ' ' << order.price << ' ' << order.mixture.toString();
+                ss << '\n';
+            }
+            graphicsItem->setPlainText(QString::fromStdString(ss.str()));
+        }
+    
+        QGraphicsItem *getGraphicsItem() override { return graphicsItem; }
+    
+    protected:
+        OrderManager *orderManager;
+        QGraphicsTextItem *graphicsItem;
+};
+
 class GuiManager final : public QGraphicsScene {
     Q_OBJECT
 
@@ -151,6 +193,9 @@ class GuiManager final : public QGraphicsScene {
             addItem(guiTile->getGraphicsItem());
             guiItems.push_back(guiTile);
         }
+        auto guiOrder = new GuiOrder(&gameManager.orderManager);
+        addItem(guiOrder->getGraphicsItem());
+        guiItems.push_back(guiOrder);
     }
 
   public slots:

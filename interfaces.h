@@ -1,5 +1,4 @@
-#ifndef INTERFACE_H_
-#define INTERFACE_H_
+#pragma once
 
 #include <box2d/box2d.h>
 
@@ -21,7 +20,7 @@ class IBody {
     BodyKind getBodyKind() { return bodyKind; }
 
   protected:
-    b2Body *body;
+    b2Body *body = nullptr;
     BodyKind bodyKind = BodyKind::Unknown;
 
     void setUserData(BodyKind kind) {
@@ -29,5 +28,3 @@ class IBody {
         body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
     }
 };
-
-#endif // INTERFACE_H_

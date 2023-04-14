@@ -1,11 +1,14 @@
 #pragma once
 
+#include <stdexcept>
+
 enum class ContainerKind {
     None,
     Pan,
     Pot,
     Dish,
-    DirtyDish,
+    Dishes,
+    DirtyDishes,
 };
 
 enum class TileKind {
@@ -14,13 +17,14 @@ enum class TileKind {
     Floor,
     Wall,
     Table,
+    Pantry,
+    Trashbin,
     CuttingBoard,
     ServingHatch,
-    WashBowl,
     Stove,
-    Trashbin,
+    WashBowl,
     DishTable,
-    Pantry,
+    DirtyDishTable,
 };
 
 inline TileKind getTileKind(char kindChar) {
@@ -37,20 +41,16 @@ inline TileKind getTileKind(char kindChar) {
         return TileKind::ServingHatch;
     case 'w':
         return TileKind::WashBowl;
-    case 'a':
-        return TileKind::Stove;
-    case 'o':
+    case 's':
         return TileKind::Stove;
     case 't':
         return TileKind::Trashbin;
     case 'd':
         return TileKind::DishTable;
+    case 'p':
+        return TileKind::Pantry;
     default:
-        if (kindChar >= 'A' && kindChar <= 'Z') {
-            return TileKind::Pantry;
-        } else {
-            throw "Unknown tile kind";
-        }
+        throw std::runtime_error("Unknown tile kind");
     }
 }
 
@@ -72,7 +72,7 @@ inline char getAbbrev(TileKind kind) {
         if (kind >= TileKind::Pantry) {
             return 'p';
         } else {
-            throw "Unknown tile kind";
+            throw std::runtime_error("Unknown tile kind");
         }
     }
 }
