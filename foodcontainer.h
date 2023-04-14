@@ -30,15 +30,14 @@ class FoodContainer {
         return containerKind == recipe->containerKind &&
                mixture == recipe->ingredients;
     }
-    void setRecipe(const Recipe *recipe) {
-        this->recipe = recipe;
-    }
+    void setRecipe(const Recipe *recipe) { this->recipe = recipe; }
 
     float getProgress() {
         if (progress >= this->recipe->time) {
             return 1.0;
         }
-        return (float)progress / this->recipe->time; }
+        return (float)progress / this->recipe->time;
+    }
     float getOvercookProgress() {
         if (progress <= this->recipe->time) {
             return 0.0;
@@ -75,14 +74,17 @@ class FoodContainer {
         }
 
         // 若是切菜，拒绝混合
-        if (this->recipe != nullptr && this->recipe->tileKind == TileKind::CuttingBoard) {
+        if (this->recipe != nullptr &&
+            this->recipe->tileKind == TileKind::CuttingBoard) {
             return false;
         }
-        if (other.recipe != nullptr && other.recipe->tileKind == TileKind::CuttingBoard) {
+        if (other.recipe != nullptr &&
+            other.recipe->tileKind == TileKind::CuttingBoard) {
             return false;
         }
         // 若菜品做到一半，而自己为空，拒绝取出
-        if (this->isEmpty() && other.recipe != nullptr && other.progress < other.recipe->time) {
+        if (this->isEmpty() && other.recipe != nullptr &&
+            other.progress < other.recipe->time) {
             return false;
         }
         // 若烹饪方式不同，拒绝混合
@@ -116,7 +118,7 @@ class FoodContainer {
 
         this->mixture.put(other.mixture);
         this->recipe = nullptr;
-        this->progress = (this->progress + other.progress)/2;
+        this->progress = (this->progress + other.progress) / 2;
         this->overcooked |= other.overcooked;
         this->collided |= other.collided;
         other.recipe = nullptr;
@@ -236,7 +238,7 @@ class ContainerHolder {
         propertyChanged = true;
     }
 
-    bool isWorking() { return !isNull() &&container->isWorking(); }
+    bool isWorking() { return !isNull() && container->isWorking(); }
     bool matchRecipe(const Recipe *recipe) {
         return container->matchRecipe(recipe);
     }
@@ -270,8 +272,10 @@ class ContainerHolder {
     }
 
     std::string toString() {
-        if (isNull()) return "";
-        return container->toString(); }
+        if (isNull())
+            return "";
+        return container->toString();
+    }
 
     bool put(ContainerHolder &other) {
         if (other.isNull()) {
@@ -293,7 +297,8 @@ class ContainerHolder {
 
         // 若 this 上存在容器，则会将 other 的物品（食材或容器中的内容）
         // 全部倒入 this 上的容器中。不存在只倾倒一部分的情况。
-        if (container->getContainerKind() != ContainerKind::None && !other.container->isEmpty()) {
+        if (container->getContainerKind() != ContainerKind::None &&
+            !other.container->isEmpty()) {
             auto res = container->directPut(*other.container);
             propertyChanged = true;
             other.propertyChanged = true;
@@ -302,13 +307,13 @@ class ContainerHolder {
 
         // 若 this 上存在容器，且 other 是空容器时，
         // 将 this 倒入 other 中。
-        if (container->getContainerKind() != ContainerKind::None && other.container->isEmpty()) {
+        if (container->getContainerKind() != ContainerKind::None &&
+            other.container->isEmpty()) {
             auto res = other.container->directPut(*container);
             propertyChanged = true;
             other.propertyChanged = true;
             return res;
         }
-
 
         // 若 this 上不存在容器（为单个食材），但是 other 上存在容器，
         // 则会将 this 中的食材放入 other 的容器中，再将容器给 this。

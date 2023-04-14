@@ -94,7 +94,11 @@ class Player : public IUpdatable, public IBody {
 
     void lateUpdate() override;
 
-    void collision(IBody *entity) { if (!onHand.isEmpty()) { onHand.setCollided(); } }
+    void collision(IBody *entity) {
+        if (!onHand.isEmpty()) {
+            onHand.setCollided();
+        }
+    }
 
     ContainerHolder *getOnHand() { return &onHand; }
 

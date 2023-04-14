@@ -147,29 +147,30 @@ class GuiTile : public GuiItem {
 };
 
 class GuiOrder : public GuiItem {
-    public:
-        GuiOrder(OrderManager *orderManager) : orderManager(orderManager) {
-            graphicsItem = new QGraphicsTextItem();
-            graphicsItem->setPos(-150, 0);
+  public:
+    GuiOrder(OrderManager *orderManager) : orderManager(orderManager) {
+        graphicsItem = new QGraphicsTextItem();
+        graphicsItem->setPos(-150, 0);
+    }
+
+    void update() override {
+        std::stringstream ss;
+        ss << "Frame: " << orderManager->getFrame() << '\n';
+        ss << "Fund: " << orderManager->getFund() << '\n';
+        ss << "Remain: " << orderManager->getTimeCountdown() << '\n';
+        for (auto &order : orderManager->getOrders()) {
+            ss << order.time << ' ' << order.price << ' '
+               << order.mixture.toString();
+            ss << '\n';
         }
-    
-        void update() override {
-            std::stringstream ss;
-            ss << "Frame: " << orderManager->getFrame() << '\n';
-            ss << "Fund: " << orderManager->getFund() << '\n';
-            ss << "Remain: " << orderManager->getTimeCountdown() << '\n';
-            for (auto &order : orderManager->getOrders()) {
-            ss << order.time << ' ' << order.price << ' ' << order.mixture.toString();
-                ss << '\n';
-            }
-            graphicsItem->setPlainText(QString::fromStdString(ss.str()));
-        }
-    
-        QGraphicsItem *getGraphicsItem() override { return graphicsItem; }
-    
-    protected:
-        OrderManager *orderManager;
-        QGraphicsTextItem *graphicsItem;
+        graphicsItem->setPlainText(QString::fromStdString(ss.str()));
+    }
+
+    QGraphicsItem *getGraphicsItem() override { return graphicsItem; }
+
+  protected:
+    OrderManager *orderManager;
+    QGraphicsTextItem *graphicsItem;
 };
 
 class GuiManager final : public QGraphicsScene {

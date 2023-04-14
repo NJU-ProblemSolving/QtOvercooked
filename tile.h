@@ -114,7 +114,9 @@ class TileTrashbin : public TileWall {
     TileTrashbin() { tileKind = TileKind::Trashbin; }
 
     bool put(ContainerHolder &container) override {
-        container.setMixture(Mixture());
+        auto kind = container.getContainerKind();
+        std::move(container);
+        container = ContainerHolder(kind, Mixture());
         return true;
     }
 };

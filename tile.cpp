@@ -71,16 +71,16 @@ bool TileServingHatch::put(ContainerHolder &container) {
     }
     if (dirtyDishTable != nullptr) {
         auto dish = ContainerHolder(ContainerKind::DirtyDishes, Mixture());
-        dish.setRespawnPoint(std::make_pair(dirtyDishTable->getPos().x, dirtyDishTable->getPos().y));
-        gameManager->entityManager.scheduleRespawn(
-            std::move(dish),
-            DISH_RECYCLE_DELAY);
+        dish.setRespawnPoint(std::make_pair(dirtyDishTable->getPos().x,
+                                            dirtyDishTable->getPos().y));
+        gameManager->entityManager.scheduleRespawn(std::move(dish),
+                                                   DISH_RECYCLE_DELAY);
     } else {
         auto dish = ContainerHolder(ContainerKind::Dish, Mixture());
-        dish.setRespawnPoint(std::make_pair(dishTable->getPos().x, dishTable->getPos().y));
-        gameManager->entityManager.scheduleRespawn(
-            std::move(dish),
-            DISH_RECYCLE_DELAY);
+        dish.setRespawnPoint(
+            std::make_pair(dishTable->getPos().x, dishTable->getPos().y));
+        gameManager->entityManager.scheduleRespawn(std::move(dish),
+                                                   DISH_RECYCLE_DELAY);
     }
 
     ContainerHolder nullContainer;

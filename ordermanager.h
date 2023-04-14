@@ -48,13 +48,15 @@ class OrderManager {
     void setRandomizeSeed(int seed) { e.seed(seed); }
 
     void step() {
-        time ++;
-        timeCountdown --;
+        time++;
+        timeCountdown--;
         for (auto &order : orders) {
             order.time--;
         }
-        orders.erase(std::remove_if(orders.begin(), orders.end(),
-                                    [](const Order &order) { return order.time <= 0; }), orders.end());
+        orders.erase(
+            std::remove_if(orders.begin(), orders.end(),
+                           [](const Order &order) { return order.time <= 0; }),
+            orders.end());
         for (int i = orders.size(); i < 4; i++) {
             generateOrder();
         }
@@ -62,9 +64,10 @@ class OrderManager {
 
     int serveDish(const Mixture &mixture) {
         auto end = orders.end();
-        auto order = std::find_if(orders.begin(), orders.end(), [&](const Order &order) {
-            return order.mixture == mixture;
-        });
+        auto order =
+            std::find_if(orders.begin(), orders.end(), [&](const Order &order) {
+                return order.mixture == mixture;
+            });
         int price = 0;
         if (order != orders.end()) {
             price = order->price;
@@ -88,7 +91,7 @@ class OrderManager {
   private:
     int time = 0;
     int timeCountdown = 0;
-      int fund = 0;
+    int fund = 0;
 
     std::vector<Order> orders;
     std::vector<OrderTemplate> templates;
