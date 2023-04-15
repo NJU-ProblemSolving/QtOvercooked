@@ -1,3 +1,6 @@
 [submodule "box2d"]
 	path = box2d
 	url = https://github.com/erincatto/box2d
+[submodule "tiny-process-library"]
+	path = tiny-process-library
+	url = https://gitlab.com/eidheim/tiny-process-library

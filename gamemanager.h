@@ -139,27 +139,30 @@ class GameManager {
             orderManager.generateOrder();
         }
 
+        int playerCount;
+        in >> playerCount;
+        for (int i = 0; i < playerCount; i++) {
+            int x, y;
+            in >> x >> y;
+            int pos = y * width + x;
+            assert(map[pos]->getTileKind() == TileKind::Floor);
+            addPlayer(x, y);
+        }
+
         int entityCount;
         in >> entityCount;
         entityManager.setGameManager(this);
         for (int i = 0; i < entityCount; i++) {
-            std::string s;
             int x, y;
-            in >> s >> x >> y;
+            std::string s;
+            in >> x >> y >> s;
             int pos = y * width + x;
-            if (s == "Player") {
-                assert(map[pos]->getTileKind() == TileKind::Floor);
-                addPlayer(x, y);
-            } else if (s == "Pot") {
-                //            assert(map[pos]->getTileKind() ==
-                //            TileKind::Table);
+            if (s == "Pot") {
                 auto table = static_cast<TileTable *>(map[pos]);
                 auto pot = ContainerHolder(ContainerKind::Pot, Mixture());
                 pot.setRespawnPoint(std::make_pair(x, y));
                 table->put(pot);
             } else if (s == "Pan") {
-                //            assert(map[pos]->getTileKind() ==
-                //            TileKind::Table);
                 auto table = static_cast<TileTable *>(map[pos]);
                 auto pan = ContainerHolder(ContainerKind::Pan, Mixture());
                 pan.setRespawnPoint(std::make_pair(x, y));
@@ -176,10 +179,6 @@ class GameManager {
         }
 
         in.close();
-    }
-
-    void move(int playerId, b2Vec2 direction) {
-        players[playerId]->move(direction);
     }
 
     void step() {
@@ -207,6 +206,16 @@ class GameManager {
     const std::vector<Tile *> &getTiles() { return map; }
     const std::vector<Recipe> &getRecipes() { return recipes; }
     const std::vector<Order> &getOrders() { return orderManager.getOrders(); }
+
+    void move(int playerId, b2Vec2 direction) {
+        players[playerId]->move(direction);
+    }
+    void interact(int playerId, int x, int y) {
+        players[playerId]->interact(getTile(x, y));
+    }
+    void putOrPick(int playerId, int x, int y) {
+        players[playerId]->putOrPick(getTile(x, y));
+    }
 
     friend class GuiManager;
 

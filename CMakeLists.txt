@@ -61,6 +61,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 add_subdirectory(box2d)
 target_link_libraries(${PROJECT_NAME} PUBLIC box2d)
 
+add_subdirectory(tiny-process-library)
+target_link_libraries(${PROJECT_NAME} PUBLIC tiny-process-library)
+
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
@@ -69,6 +72,8 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
 )
+
+qt_disable_unicode_defines(${PROJECT_NAME})
 
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(${PROJECT_NAME})

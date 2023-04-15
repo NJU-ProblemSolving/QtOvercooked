@@ -68,7 +68,7 @@ class Player : public IUpdatable, public IBody {
         }
     }
 
-    void pickOrPut(Tile *tile) {
+    void putOrPick(Tile *tile) {
         if (respawnCountdown > 0) {
             return;
         }

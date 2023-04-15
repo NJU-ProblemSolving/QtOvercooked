@@ -19,11 +19,12 @@ IngredientBox 0 5 B 0
 14400 123456 2
 5400 20 30 cB
 7200 60 30 pA cB
-7
-Player 3 3
-Player 6 6
-Pot 0 7
-Pot 9 7
-Plate 3 9
-Plate 4 9
-Plate 5 9
+2
+3 3
+6 6
+5
+0 7 Pot
+9 7 Pot
+3 9 Plate
+4 9 Plate
+5 9 Plate

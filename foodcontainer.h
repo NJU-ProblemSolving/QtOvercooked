@@ -53,6 +53,8 @@ class FoodContainer {
         }
         return (float)(progress - this->recipe->time) / (OVERCOOK_TIME);
     }
+    int getProgressTick() { return progress; }
+    int getProgressMaxTick() { return this->recipe->time; }
     float calcPriceFactor() {
         if (collided) {
             return 0.7;
@@ -182,19 +184,21 @@ class FoodContainer {
         case ContainerKind::None:
             break;
         case ContainerKind::Pan:
-            s += "Pan:";
+            s += "Pan";
             break;
         case ContainerKind::Pot:
-            s += "Pot:";
+            s += "Pot";
             break;
         case ContainerKind::Plate:
-            s += "Plate:";
+            s += "Plate";
             break;
         case ContainerKind::DirtyPlates:
-            s += "DirtyPlatesX" + std::to_string(dirtyPlateCount);
+            s += "DirtyPlates " + std::to_string(dirtyPlateCount);
             break;
         }
-        s += mixture.toString();
+        if (!mixture.isEmpty()) {
+            s += " : " + mixture.toString();
+        }
         return s;
     }
 
@@ -270,6 +274,8 @@ class ContainerHolder {
 
     float getProgress() { return container->getProgress(); }
     float getOvercookProgress() { return container->getOvercookProgress(); }
+    int getProgressTick() { return container->getProgressTick(); }
+    int getProgressTickMax() { return container->getProgressMaxTick(); }
     float calcPriceFactor() { return container->calcPriceFactor(); }
 
     void setRespawnPoint(std::pair<int, int> point) {

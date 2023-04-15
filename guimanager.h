@@ -5,6 +5,8 @@
 #include <QKeyEvent>
 #include <QMap>
 
+#include <tiny-process-library/process.hpp>
+
 #include "config.h"
 #include "foodcontainer.h"
 #include "gamemanager.h"
@@ -177,93 +179,30 @@ class GuiManager final : public QGraphicsScene {
     Q_OBJECT
 
   public:
-    GuiManager() {}
+    GuiManager(GameManager *gameManager) : gameManager(gameManager) {}
     ~GuiManager() {}
     GuiManager(const GuiManager &) = delete;
     GuiManager &operator=(const GuiManager &) = delete;
 
-    void load(std::string filename) {
-        gameManager.loadLevel(filename);
-        for (auto &player : gameManager.getPlayers()) {
+    void init() {
+        for (auto &player : gameManager->getPlayers()) {
             auto guiPlayer = new GuiPlayer(player);
             addItem(guiPlayer->getGraphicsItem());
             guiItems.push_back(guiPlayer);
         }
-        for (auto &tile : gameManager.getTiles()) {
+        for (auto &tile : gameManager->getTiles()) {
             auto guiTile = new GuiTile(tile);
             addItem(guiTile->getGraphicsItem());
             guiItems.push_back(guiTile);
         }
-        auto guiOrder = new GuiOrder(&gameManager.orderManager);
+        auto guiOrder = new GuiOrder(&gameManager->orderManager);
         addItem(guiOrder->getGraphicsItem());
         guiItems.push_back(guiOrder);
     }
 
-  public slots:
+
+public slots:
     void step() {
-        {
-            static int lastMove = 1;
-            b2Vec2 move(0, 0);
-            if (getKey(Qt::Key_A)) {
-                move.x -= 1;
-                lastMove = 1;
-            }
-            if (getKey(Qt::Key_D)) {
-                move.x += 1;
-                lastMove = 2;
-            }
-            if (getKey(Qt::Key_W)) {
-                move.y -= 1;
-                lastMove = 3;
-            }
-            if (getKey(Qt::Key_S)) {
-                move.y += 1;
-                lastMove = 4;
-            }
-            if (getKeyDown(Qt::Key_Space)) {
-                int x = gameManager.players[0]->getBody()->GetPosition().x;
-                int y = gameManager.players[0]->getBody()->GetPosition().y;
-                switch (lastMove) {
-                case 1:
-                    x -= 1;
-                    break;
-                case 2:
-                    x += 1;
-                    break;
-                case 3:
-                    y -= 1;
-                    break;
-                case 4:
-                    y += 1;
-                    break;
-                }
-                gameManager.players[0]->pickOrPut(gameManager.getTile(x, y));
-            }
-            if (getKeyDown(Qt::Key_J)) {
-                int x = gameManager.players[0]->getBody()->GetPosition().x;
-                int y = gameManager.players[0]->getBody()->GetPosition().y;
-                switch (lastMove) {
-                case 1:
-                    x -= 1;
-                    break;
-                case 2:
-                    x += 1;
-                    break;
-                case 3:
-                    y -= 1;
-                    break;
-                case 4:
-                    y += 1;
-                    break;
-                }
-                gameManager.players[0]->interact(gameManager.getTile(x, y));
-            }
-            gameManager.move(0, move);
-        }
-        for (int i = 1; i < gameManager.players.size(); i++) {
-            gameManager.move(i, b2Vec2(0, 0));
-        }
-        gameManager.step();
         for (auto &guiItem : guiItems) {
             guiItem->update();
         }
@@ -271,7 +210,7 @@ class GuiManager final : public QGraphicsScene {
     }
 
   private:
-    GameManager gameManager;
+    GameManager *gameManager;
     std::vector<GuiItem *> guiItems;
 
   public:
