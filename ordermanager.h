@@ -52,6 +52,9 @@ class OrderManager {
         timeCountdown--;
         for (auto &order : orders) {
             order.time--;
+            if (order.time <= 0) {
+                tipFactor = 0;
+            }
         }
         orders.erase(
             std::remove_if(orders.begin(), orders.end(),
@@ -70,8 +73,15 @@ class OrderManager {
             });
         int price = 0;
         if (order != orders.end()) {
-            price = order->price;
+            price = order->price + tipFactor * 8;
+            if (order == orders.begin()) {
+                tipFactor++;
+            } else {
+                tipFactor = 0;
+            }
             orders.erase(order);
+        } else {
+            tipFactor = 0;
         }
         return price;
     }
@@ -92,6 +102,7 @@ class OrderManager {
     int time = 0;
     int timeCountdown = 0;
     int fund = 0;
+    int tipFactor = 0;
 
     std::vector<Order> orders;
     std::vector<OrderTemplate> templates;

@@ -22,6 +22,7 @@ class Recipe {
     int time;
 };
 
-extern Recipe GeneralCookRecipe;
+extern Recipe GeneralCookingRecipe;
+extern Recipe PlateWashingRecipe;
 
 #endif

@@ -17,8 +17,8 @@ class Tile : public IBody {
     void setPos(b2Vec2 position) { this->position = position; }
 
     virtual void initB2(b2World *world) {}
-    void setGameManager(GameManager *levelManager) {
-        this->gameManager = levelManager;
+    void setGameManager(GameManager *gameManager) {
+        this->gameManager = gameManager;
     }
 
     virtual bool put(ContainerHolder &container) { return false; }
@@ -85,9 +85,9 @@ class TileTable : public TileWall {
     ContainerHolder containerOnTable;
 };
 
-class TilePantry : public TileTable {
+class TileIngredientBox : public TileTable {
   public:
-    TilePantry() { tileKind = TileKind::Pantry; }
+    TileIngredientBox() { tileKind = TileKind::IngredientBox; }
 
     std::string getIngredient() { return ingredient; }
     void init(std::string ingredient, int price) {
@@ -115,15 +115,15 @@ class TileTrashbin : public TileWall {
 
     bool put(ContainerHolder &container) override {
         auto kind = container.getContainerKind();
-        std::move(container);
+        auto trash = std::move(container);
         container = ContainerHolder(kind, Mixture());
         return true;
     }
 };
 
-class TileCuttingBoard : public TileTable {
+class TileChoppingStation : public TileTable {
   public:
-    TileCuttingBoard() { tileKind = TileKind::CuttingBoard; }
+    TileChoppingStation() { tileKind = TileKind::ChoppingStation; }
 
     bool interact() override;
 };
@@ -135,21 +135,28 @@ class TileStove : public TileTable, public IUpdatable {
     void lateUpdate() override;
 };
 
-class TileServingHatch : public TileWall {
+class TileServiceWindow : public TileWall {
   public:
-    TileServingHatch() { tileKind = TileKind::ServingHatch; }
+    TileServiceWindow() { tileKind = TileKind::ServiceWindow; }
 
     bool put(ContainerHolder &container) override;
 };
 
-class TileDishTable : public TileTable {
+class TilePlateReturn : public TileTable {
   public:
-    TileDishTable() { tileKind = TileKind::DishTable; }
+    TilePlateReturn() { tileKind = TileKind::PlateReturn; }
 };
 
-class TileDirtyDishTable : public TileTable {
+class TileSink : public TileTable {
+public:
+    TileSink() { tileKind = TileKind::Sink; }
+
+    bool interact() override;
+};
+
+class TilePlateRack : public TileTable {
   public:
-    TileDirtyDishTable() { tileKind = TileKind::DirtyDishTable; }
+    TilePlateRack() { tileKind = TileKind::PlateRack; }
 };
 
 inline Tile *CreateTile(TileKind kind) {
@@ -164,19 +171,21 @@ inline Tile *CreateTile(TileKind kind) {
         return new TileTable();
     case TileKind::Trashbin:
         return new TileTrashbin();
-    case TileKind::CuttingBoard:
-        return new TileCuttingBoard();
+    case TileKind::ChoppingStation:
+        return new TileChoppingStation();
     case TileKind::Stove:
         return new TileStove();
-    case TileKind::ServingHatch:
-        return new TileServingHatch();
-    case TileKind::Pantry:
-        return new TilePantry();
-    case TileKind::DishTable:
-        return new TileDishTable();
-    case TileKind::DirtyDishTable:
-        return new TileDirtyDishTable();
+    case TileKind::ServiceWindow:
+        return new TileServiceWindow();
+    case TileKind::IngredientBox:
+        return new TileIngredientBox();
+    case TileKind::PlateReturn:
+        return new TilePlateReturn();
+    case TileKind::Sink:
+        return new TileSink();
+    case TileKind::PlateRack:
+        return new TilePlateRack();
     default:
-        throw std::runtime_error("Unknown tile kind");
+        throw std::runtime_error("CreateTile: Unknown tile kind");
     }
 }

@@ -11,9 +11,11 @@ constexpr float PLAYER_EPISILON_SPEED = PLAYER_DECELERATION / FPS * 1.5f;
 constexpr float PLAYER_INTERACT_DISTANCE = 1.3f;
 
 constexpr int PLAYER_RESPAWN_TIME = 5 * FPS;
+constexpr int CONTAINER_RESPAWN_TIME = 5 * FPS;
 constexpr int OVERCOOK_TIME = 10 * FPS;
-constexpr int GENERAL_COOK_TIME = 10 * FPS;
-constexpr int DISH_RECYCLE_DELAY = 5 * FPS;
+constexpr int GENERAL_COOKING_TIME = 10 * FPS;
+constexpr int PLATE_WASHING_TIME = 3 * FPS;
+constexpr int PLATE_RETURN_DELAY = 5 * FPS;
 
 constexpr float SCALE = 30;
 constexpr float BORDERWIDTHS = 1;

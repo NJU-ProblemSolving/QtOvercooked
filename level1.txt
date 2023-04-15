@@ -2,28 +2,28 @@
 **********
 *........*
 **c*...***
-*........d
+*........p
 A........$
 B........t
 *........*
 s........s
 *....... *
-**********
+*kr*******
 2
-Pantry 0 4 A 0
-Pantry 0 5 B 0
+IngredientBox 0 4 A 0
+IngredientBox 0 5 B 0
 3
-90 A -cut-> cA
+90 A -chop-> cA
 600 cA -pot-> pA
-90 B -cut-> cB
+90 B -chop-> cB
 14400 123456 2
-1800 20 30 cB
-2400 60 30 pA cB
+5400 20 30 cB
+7200 60 30 pA cB
 7
 Player 3 3
 Player 6 6
 Pot 0 7
 Pot 9 7
-Dish 3 9
-Dish 4 9
-Dish 5 9
+Plate 3 9
+Plate 4 9
+Plate 5 9

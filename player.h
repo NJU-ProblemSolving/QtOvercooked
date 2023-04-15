@@ -14,8 +14,8 @@ class Player : public IUpdatable, public IBody {
   public:
     Player() { bodyKind = BodyKind::Player; }
 
-    void setLevelManager(GameManager *levelManager) {
-        this->levelManager = levelManager;
+    void setLevelManager(GameManager *gameManager) {
+        this->gameManager = gameManager;
     }
     void setSpawnPoint(b2Vec2 point) { spawnPoint = point; }
 
@@ -103,7 +103,7 @@ class Player : public IUpdatable, public IBody {
     ContainerHolder *getOnHand() { return &onHand; }
 
   protected:
-    GameManager *levelManager;
+    GameManager *gameManager;
     b2Vec2 spawnPoint;
     int respawnCountdown = 0;
 

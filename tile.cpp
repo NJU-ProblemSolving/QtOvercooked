@@ -1,8 +1,9 @@
 #include "tile.h"
 
 #include "gamemanager.h"
+#include "recipe.h"
 
-bool TileCuttingBoard::interact() {
+bool TileChoppingStation::interact() {
     if (containerOnTable.isNull()) {
         return false;
     }
@@ -40,7 +41,7 @@ void TileStove::lateUpdate() {
 
     if (!containerOnTable.isWorking()) {
         if (!containerOnTable.isEmpty()) {
-            containerOnTable.setRecipe(&GeneralCookRecipe);
+            containerOnTable.setRecipe(&GeneralCookingRecipe);
         } else {
             return;
         }
@@ -49,8 +50,8 @@ void TileStove::lateUpdate() {
     containerOnTable.step(tileKind);
 }
 
-bool TileServingHatch::put(ContainerHolder &container) {
-    if (container.getContainerKind() != ContainerKind::Dish) {
+bool TileServiceWindow::put(ContainerHolder &container) {
+    if (container.getContainerKind() != ContainerKind::Plate) {
         return false;
     }
 
@@ -59,31 +60,58 @@ bool TileServingHatch::put(ContainerHolder &container) {
     float factor = container.calcPriceFactor();
     gameManager->orderManager.addFund(price * factor);
 
-    Tile *dishTable = nullptr;
-    Tile *dirtyDishTable = nullptr;
+    Tile *plateReturn = nullptr;
+    Tile *sink = nullptr;
     for (auto &tile : gameManager->getTiles()) {
-        if (tile->getTileKind() == TileKind::DirtyDishTable) {
-            dirtyDishTable = tile;
+        if (tile->getTileKind() == TileKind::Sink) {
+            sink = tile;
         }
-        if (tile->getTileKind() == TileKind::DishTable) {
-            dishTable = tile;
+        if (tile->getTileKind() == TileKind::PlateReturn) {
+            plateReturn = tile;
         }
     }
-    if (dirtyDishTable != nullptr) {
-        auto dish = ContainerHolder(ContainerKind::DirtyDishes, Mixture());
-        dish.setRespawnPoint(std::make_pair(dirtyDishTable->getPos().x,
-                                            dirtyDishTable->getPos().y));
+    if (sink != nullptr) {
+        auto dish = ContainerHolder(ContainerKind::DirtyPlates, Mixture());
+        dish.setRespawnPoint(std::make_pair(plateReturn->getPos().x,
+                                            plateReturn->getPos().y));
         gameManager->entityManager.scheduleRespawn(std::move(dish),
-                                                   DISH_RECYCLE_DELAY);
+                                                   PLATE_RETURN_DELAY);
     } else {
-        auto dish = ContainerHolder(ContainerKind::Dish, Mixture());
+        auto dish = ContainerHolder(ContainerKind::Plate, Mixture());
         dish.setRespawnPoint(
-            std::make_pair(dishTable->getPos().x, dishTable->getPos().y));
+            std::make_pair(plateReturn->getPos().x, plateReturn->getPos().y));
         gameManager->entityManager.scheduleRespawn(std::move(dish),
-                                                   DISH_RECYCLE_DELAY);
+                                                   PLATE_RETURN_DELAY);
+
     }
 
     ContainerHolder nullContainer;
     nullContainer.put(container);
+    return true;
+}
+
+bool TileSink::interact() {
+    if (containerOnTable.isNull() || containerOnTable.getContainerKind() != ContainerKind::DirtyPlates) {
+        return false;
+    }
+
+    if (!containerOnTable.isWorking()) {
+        containerOnTable.setRecipe(&PlateWashingRecipe);
+    }
+
+    if (containerOnTable.step(tileKind)) {
+        Tile *rack = nullptr;
+        for (auto &tile : gameManager->getTiles()) {
+            if (tile->getTileKind() == TileKind::PlateRack) {
+                rack = tile;
+            }
+        }
+        auto dish = ContainerHolder(ContainerKind::Plate, Mixture());
+        dish.setRespawnPoint(
+            std::make_pair(rack->getPos().x, rack->getPos().y));
+        gameManager->entityManager.scheduleRespawn(std::move(dish),
+                                                   1);
+        containerOnTable.removeOnePlate();
+    }
     return true;
 }

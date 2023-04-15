@@ -44,7 +44,7 @@ class GameManager {
             if (kindChar >= 'A' && kindChar <= 'Z') {
                 map[i] = nullptr;
             } else {
-                addTile(i, kindChar);
+                addTile(i, getTileKind(kindChar));
             }
         }
         in >> std::skipws;
@@ -56,13 +56,13 @@ class GameManager {
             int x, y;
             in >> s >> x >> y;
             int pos = y * width + x;
-            if (s == "Pantry") {
+            if (s == "IngredientBox") {
                 std::string ingredient;
                 int price;
                 in >> ingredient >> price;
                 assert(map[pos] == nullptr);
-                addTile(pos, 'p');
-                auto pantry = static_cast<TilePantry *>(map[pos]);
+                addTile(pos, TileKind::IngredientBox);
+                auto pantry = static_cast<TileIngredientBox *>(map[pos]);
                 pantry->init(ingredient, price);
             } else {
                 throw std::runtime_error("Invalid illustration");
@@ -90,9 +90,9 @@ class GameManager {
 
             ContainerKind containerKind;
             TileKind tileKind;
-            if (s == "-cut->") {
+            if (s == "-chop->") {
                 containerKind = ContainerKind::None;
-                tileKind = TileKind::CuttingBoard;
+                tileKind = TileKind::ChoppingStation;
             } else if (s == "-pot->") {
                 containerKind = ContainerKind::Pot;
                 tileKind = TileKind::Stove;
@@ -164,10 +164,10 @@ class GameManager {
                 auto pan = ContainerHolder(ContainerKind::Pan, Mixture());
                 pan.setRespawnPoint(std::make_pair(x, y));
                 table->put(pan);
-            } else if (s == "Dish") {
+            } else if (s == "Plate") {
                 assert(map[pos]->getTileKind() == TileKind::Table);
                 auto table = static_cast<TileTable *>(map[pos]);
-                auto dish = ContainerHolder(ContainerKind::Dish, Mixture());
+                auto dish = ContainerHolder(ContainerKind::Plate, Mixture());
                 dish.setRespawnPoint(std::make_pair(x, y));
                 table->put(dish);
             } else {
@@ -209,7 +209,9 @@ class GameManager {
     const std::vector<Order> &getOrders() { return orderManager.getOrders(); }
 
     friend class GuiManager;
-    friend class TileServingHatch;
+
+    OrderManager orderManager;
+    EntityManager entityManager;
 
   protected:
     b2World *world;
@@ -219,8 +221,6 @@ class GameManager {
     std::vector<Player *> players;
     std::vector<Tile *> map;
     std::vector<Recipe> recipes;
-    OrderManager orderManager;
-    EntityManager entityManager;
 
     std::vector<IUpdatable *> updateList;
 
@@ -234,8 +234,7 @@ class GameManager {
         updateList.push_back(player);
     }
 
-    void addTile(int i, char kindChar) {
-        auto kind = getTileKind(kindChar);
+    void addTile(int i, TileKind kind) {
         map[i] = CreateTile(kind);
         map[i]->setPos(b2Vec2(i % width, i / width));
         map[i]->initB2(world);

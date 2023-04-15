@@ -6,9 +6,8 @@ enum class ContainerKind {
     None,
     Pan,
     Pot,
-    Dish,
-    Dishes,
-    DirtyDishes,
+    Plate,
+    DirtyPlates,
 };
 
 enum class TileKind {
@@ -17,14 +16,14 @@ enum class TileKind {
     Floor,
     Wall,
     Table,
-    Pantry,
+    IngredientBox,
     Trashbin,
-    CuttingBoard,
-    ServingHatch,
+    ChoppingStation,
+    ServiceWindow,
     Stove,
-    WashBowl,
-    DishTable,
-    DirtyDishTable,
+    PlateReturn,
+    Sink,
+    PlateRack,
 };
 
 inline TileKind getTileKind(char kindChar) {
@@ -35,44 +34,44 @@ inline TileKind getTileKind(char kindChar) {
         return TileKind::Floor;
     case '*':
         return TileKind::Table;
-    case 'c':
-        return TileKind::CuttingBoard;
-    case '$':
-        return TileKind::ServingHatch;
-    case 'w':
-        return TileKind::WashBowl;
-    case 's':
-        return TileKind::Stove;
     case 't':
         return TileKind::Trashbin;
-    case 'd':
-        return TileKind::DishTable;
+    case 'c':
+        return TileKind::ChoppingStation;
+    case '$':
+        return TileKind::ServiceWindow;
+    case 's':
+        return TileKind::Stove;
     case 'p':
-        return TileKind::Pantry;
+        return TileKind::PlateReturn;
+    case 'k':
+        return TileKind::Sink;
+    case 'r':
+        return TileKind::PlateRack;
     default:
-        throw std::runtime_error("Unknown tile kind");
+        throw std::runtime_error("getTileKind: Unknown tile kind");
     }
 }
 
 inline char getAbbrev(TileKind kind) {
     switch (kind) {
-    case TileKind::CuttingBoard:
-        return 'c';
-    case TileKind::ServingHatch:
-        return '$';
-    case TileKind::WashBowl:
-        return 'w';
-    case TileKind::Stove:
-        return 's';
+    case TileKind::IngredientBox:
+        return 'i';
     case TileKind::Trashbin:
         return 't';
-    case TileKind::DishTable:
-        return 'd';
+    case TileKind::ChoppingStation:
+        return 'c';
+    case TileKind::ServiceWindow:
+        return '$';
+    case TileKind::Stove:
+        return 's';
+    case TileKind::PlateReturn:
+        return 'p';
+    case TileKind::Sink:
+        return 'k';
+    case TileKind::PlateRack:
+        return 'r';
     default:
-        if (kind >= TileKind::Pantry) {
-            return 'p';
-        } else {
-            throw std::runtime_error("Unknown tile kind");
-        }
+        throw std::runtime_error("getAbbrev: Unknown tile kind");
     }
 }

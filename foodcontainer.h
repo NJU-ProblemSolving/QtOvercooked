@@ -12,7 +12,13 @@ class FoodContainer {
   public:
     FoodContainer(ContainerKind kind = ContainerKind::None,
                   const Mixture &mixture = Mixture())
-        : containerKind(kind), mixture(mixture) {}
+        : containerKind(kind), mixture(mixture) {
+        if (kind == ContainerKind::DirtyPlates) {
+            dirtyPlateCount = 1;
+        } else {
+            dirtyPlateCount = 0;
+        }
+    }
 
     FoodContainer(FoodContainer &) = delete;
     FoodContainer &operator=(const FoodContainer &other) = delete;
@@ -62,11 +68,25 @@ class FoodContainer {
 
     void setCollided() { collided = true; }
 
+    void removeOnePlate() {
+        assert(this->containerKind == ContainerKind::DirtyPlates);
+        dirtyPlateCount -= 1;
+        if (dirtyPlateCount == 0) {
+            containerKind = ContainerKind::None;
+            recipe = nullptr;
+        }
+    }
+
     // 将 other 倒入 self
     bool directPut(FoodContainer &other) {
-        if (other.containerKind == ContainerKind::Dishes ||
-            other.containerKind == ContainerKind::DirtyDishes) {
-            return false;
+        if (other.containerKind == ContainerKind::DirtyPlates) {
+            if (this->containerKind != ContainerKind::DirtyPlates) {
+                return false;
+            }
+            this->dirtyPlateCount += other.dirtyPlateCount;
+            other.dirtyPlateCount = 0;
+            other.containerKind = ContainerKind::None;
+            return true;
         }
         assert(this->containerKind != ContainerKind::None);
         if (other.mixture.isEmpty()) {
@@ -75,11 +95,11 @@ class FoodContainer {
 
         // 若是切菜，拒绝混合
         if (this->recipe != nullptr &&
-            this->recipe->tileKind == TileKind::CuttingBoard) {
+            this->recipe->tileKind == TileKind::ChoppingStation) {
             return false;
         }
         if (other.recipe != nullptr &&
-            other.recipe->tileKind == TileKind::CuttingBoard) {
+            other.recipe->tileKind == TileKind::ChoppingStation) {
             return false;
         }
         // 若菜品做到一半，而自己为空，拒绝取出
@@ -94,7 +114,7 @@ class FoodContainer {
         }
 
         // 计算混合后的烹饪进度
-        if (this->containerKind == ContainerKind::Dish) {
+        if (this->containerKind == ContainerKind::Plate) {
             this->progress = 0;
             other.progress = 0;
         }
@@ -128,24 +148,25 @@ class FoodContainer {
         return true;
     }
 
-    void step(TileKind tileKind) {
+    bool step(TileKind tileKind) {
         if (tileKind != recipe->tileKind) {
-            return;
+            return false;
         }
         progress++;
         if (progress == recipe->time) {
             if (!recipe->result.isEmpty()) {
                 setMixture(recipe->result);
             }
-            if (recipe->tileKind == TileKind::CuttingBoard) {
+            if (recipe->tileKind == TileKind::ChoppingStation || recipe->tileKind == TileKind::Sink) {
                 recipe = nullptr;
                 progress = 0;
-                return;
+                return true;
             }
         }
         if (progress > recipe->time + OVERCOOK_TIME) {
             overcooked = true;
         }
+        return false;
     }
 
     std::string toString() {
@@ -165,14 +186,11 @@ class FoodContainer {
         case ContainerKind::Pot:
             s += "Pot:";
             break;
-        case ContainerKind::Dish:
-            s += "Dish:";
+        case ContainerKind::Plate:
+            s += "Plate:";
             break;
-        case ContainerKind::Dishes:
-            s += "Dishes";
-            break;
-        case ContainerKind::DirtyDishes:
-            s += "DirtyDishes";
+        case ContainerKind::DirtyPlates:
+            s += "DirtyPlatesX" + std::to_string(dirtyPlateCount);
             break;
         }
         s += mixture.toString();
@@ -187,6 +205,8 @@ class FoodContainer {
 
     const Recipe *recipe = nullptr;
     int progress = 0;
+
+    int dirtyPlateCount = 0;
 
     bool overcooked = false;
     bool collided = false;
@@ -258,11 +278,19 @@ class ContainerHolder {
         return container->getRespawnPoint();
     }
 
-    void setCollided() { container->setCollided(); }
-
-    void step(TileKind tileKind) {
-        container->step(tileKind);
+    void setCollided() {
+        container->setCollided();
         propertyChanged = true;
+    }
+
+    void removeOnePlate() {
+        container->removeOnePlate();
+        propertyChanged = true;
+    }
+
+    bool step(TileKind tileKind) {
+        propertyChanged = true;
+        return container->step(tileKind);
     }
 
     bool isPropertyChanged() {
@@ -286,13 +314,6 @@ class ContainerHolder {
             return true;
         }
 
-        if (container->getContainerKind() == ContainerKind::Dishes ||
-            container->getContainerKind() == ContainerKind::DirtyDishes ||
-            other.container->getContainerKind() == ContainerKind::Dishes ||
-            other.container->getContainerKind() == ContainerKind::DirtyDishes) {
-            return false;
-        }
-
         // 倾倒规则
 
         // 若 this 上存在容器，则会将 other 的物品（食材或容器中的内容）
@@ -308,7 +329,7 @@ class ContainerHolder {
         // 若 this 上存在容器，且 other 是空容器时，
         // 将 this 倒入 other 中。
         if (container->getContainerKind() != ContainerKind::None &&
-            other.container->isEmpty()) {
+            !container->isEmpty() && other.container->isEmpty()) {
             auto res = other.container->directPut(*container);
             propertyChanged = true;
             other.propertyChanged = true;
@@ -323,7 +344,10 @@ class ContainerHolder {
             return res;
         }
 
-        return false;
+        auto res = container->directPut(*other.container);
+        propertyChanged = true;
+        other.propertyChanged = true;
+        return res;
     }
 
   protected:

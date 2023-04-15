@@ -118,8 +118,8 @@ class GuiTile : public GuiItem {
             graphicsItem->setZValue(1);
             auto text =
                 new QGraphicsTextItem(QString(getAbbrev(kind)), graphicsItem);
-            if (kind == TileKind::Pantry) {
-                auto pantry = static_cast<TilePantry *>(tile);
+            if (kind == TileKind::IngredientBox) {
+                auto pantry = static_cast<TileIngredientBox *>(tile);
                 text->setPlainText(
                     QString::fromStdString(pantry->getIngredient()));
             }
