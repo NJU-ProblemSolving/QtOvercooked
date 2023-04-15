@@ -21,7 +21,8 @@ void Player::lateUpdate() {
         body->SetEnabled(false);
         auto container = ContainerHolder(onHand.getContainerKind(), Mixture());
         container.setRespawnPoint(onHand.getRespawnPoint());
-        gameManager->entityManager.scheduleRespawn(std::move(container), CONTAINER_RESPAWN_TIME);
+        gameManager->entityManager.scheduleRespawn(std::move(container),
+                                                   CONTAINER_RESPAWN_TIME);
         container = std::move(onHand);
         onHand = ContainerHolder();
         respawnCountdown = PLAYER_RESPAWN_TIME;

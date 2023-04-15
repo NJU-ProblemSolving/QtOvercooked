@@ -148,7 +148,7 @@ class TilePlateReturn : public TileTable {
 };
 
 class TileSink : public TileTable {
-public:
+  public:
     TileSink() { tileKind = TileKind::Sink; }
 
     bool interact() override;

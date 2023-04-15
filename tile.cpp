@@ -72,8 +72,8 @@ bool TileServiceWindow::put(ContainerHolder &container) {
     }
     if (sink != nullptr) {
         auto dish = ContainerHolder(ContainerKind::DirtyPlates, Mixture());
-        dish.setRespawnPoint(std::make_pair(plateReturn->getPos().x,
-                                            plateReturn->getPos().y));
+        dish.setRespawnPoint(
+            std::make_pair(plateReturn->getPos().x, plateReturn->getPos().y));
         gameManager->entityManager.scheduleRespawn(std::move(dish),
                                                    PLATE_RETURN_DELAY);
     } else {
@@ -82,7 +82,6 @@ bool TileServiceWindow::put(ContainerHolder &container) {
             std::make_pair(plateReturn->getPos().x, plateReturn->getPos().y));
         gameManager->entityManager.scheduleRespawn(std::move(dish),
                                                    PLATE_RETURN_DELAY);
-
     }
 
     ContainerHolder nullContainer;
@@ -91,7 +90,8 @@ bool TileServiceWindow::put(ContainerHolder &container) {
 }
 
 bool TileSink::interact() {
-    if (containerOnTable.isNull() || containerOnTable.getContainerKind() != ContainerKind::DirtyPlates) {
+    if (containerOnTable.isNull() ||
+        containerOnTable.getContainerKind() != ContainerKind::DirtyPlates) {
         return false;
     }
 
@@ -109,8 +109,7 @@ bool TileSink::interact() {
         auto dish = ContainerHolder(ContainerKind::Plate, Mixture());
         dish.setRespawnPoint(
             std::make_pair(rack->getPos().x, rack->getPos().y));
-        gameManager->entityManager.scheduleRespawn(std::move(dish),
-                                                   1);
+        gameManager->entityManager.scheduleRespawn(std::move(dish), 1);
         containerOnTable.removeOnePlate();
     }
     return true;

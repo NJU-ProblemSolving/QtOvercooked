@@ -157,7 +157,8 @@ class FoodContainer {
             if (!recipe->result.isEmpty()) {
                 setMixture(recipe->result);
             }
-            if (recipe->tileKind == TileKind::ChoppingStation || recipe->tileKind == TileKind::Sink) {
+            if (recipe->tileKind == TileKind::ChoppingStation ||
+                recipe->tileKind == TileKind::Sink) {
                 recipe = nullptr;
                 progress = 0;
                 return true;
