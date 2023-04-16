@@ -226,9 +226,6 @@ class ContainerHolder {
 
     ContainerHolder(const ContainerHolder &other) = delete;
     ContainerHolder(ContainerHolder &&other) {
-        if (container != nullptr) {
-            delete container;
-        }
         container = other.container;
         other.container = nullptr;
         propertyChanged = true;
@@ -253,10 +250,18 @@ class ContainerHolder {
         }
     }
 
+    ContainerHolder move() {
+        ContainerHolder res{};
+        res.container = this->container;
+        this->container = nullptr;
+        propertyChanged = true;
+        return std::move(res);
+    }
+
     bool isNull() { return container == nullptr || container->isNull(); }
     bool isEmpty() { return container == nullptr || container->isEmpty(); }
 
-    ContainerKind getContainerKind() { return container->getContainerKind(); }
+    ContainerKind getContainerKind() { return isNull() ? ContainerKind::None : container->getContainerKind(); }
     const Mixture &getMixture() { return container->getMixture(); }
     void setMixture(const Mixture &mixture) {
         container->setMixture(mixture);
@@ -338,6 +343,15 @@ class ContainerHolder {
         if (container->getContainerKind() != ContainerKind::None &&
             !container->isEmpty() && other.container->isEmpty()) {
             auto res = other.container->directPut(*container);
+            propertyChanged = true;
+            other.propertyChanged = true;
+            return res;
+        }
+
+        // this 上存在容器，但 this 和 other 均为空，将 other 放入 this。
+        if (container->getContainerKind() != ContainerKind::None) {
+            assert(container->isEmpty() && other.container->isEmpty());
+            auto res = container->directPut(*other.container);
             propertyChanged = true;
             other.propertyChanged = true;
             return res;

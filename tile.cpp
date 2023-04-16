@@ -106,6 +106,7 @@ bool TileSink::interact() {
                 rack = tile;
             }
         }
+        assert(rack != nullptr);
         auto dish = ContainerHolder(ContainerKind::Plate, Mixture());
         dish.setRespawnPoint(
             std::make_pair(rack->getPos().x, rack->getPos().y));
