@@ -200,8 +200,7 @@ class GuiManager final : public QGraphicsScene {
         guiItems.push_back(guiOrder);
     }
 
-
-public slots:
+  public slots:
     void step() {
         for (auto &guiItem : guiItems) {
             guiItem->update();

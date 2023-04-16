@@ -4,14 +4,14 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QMainWindow>
+#include <QThread>
 #include <QTimer>
+#include <codecvt>
+#include <condition_variable>
 #include <fstream>
 #include <getopt.h>
-#include <mutex>
-#include <codecvt>
 #include <locale>
-#include <QThread>
-#include <condition_variable>
+#include <mutex>
 
 #include "./ui_mainwindow.h"
 #include "guimanager.h"
@@ -47,9 +47,8 @@ class CliController : public Controller {
     std::chrono::time_point<std::chrono::system_clock> responseTime;
 
   public:
-    CliController(GameManager *g, const char *program)
-        : Controller(g) {
-         log.open("clilog.txt", std::ios::out | std::ios::trunc);
+    CliController(GameManager *g, const char *program) : Controller(g) {
+        log.open("clilog.txt", std::ios::out | std::ios::trunc);
 
         process = new TinyProcessLib::Process(
             program, TinyProcessLib::Process::string_type(),
@@ -69,9 +68,8 @@ class CliController : public Controller {
                 std::getline(ss, s);
 
                 if (responseFrame != frame) {
-                    log << "!!! Frame mismatch: response "
-                              << responseFrame << " != current " << frame
-                              << std::endl;
+                    log << "!!! Frame mismatch: response " << responseFrame
+                        << " != current " << frame << std::endl;
                     log.flush();
                     return;
                 }
@@ -131,20 +129,22 @@ class CliController : public Controller {
             auto y = player->getBody()->GetPosition().y;
             ss << x << ' ' << y;
             if (!player->getOnHand()->isNull()) {
-                ss  << " ; ";
+                ss << " ; ";
                 printContainer(ss, player->getOnHand());
             }
             ss << '\n';
         }
         int count = 0;
         for (auto &tile : gameManager->getTiles()) {
-            if (tile->getContainer() != nullptr && !tile->getContainer()->isNull()) {
+            if (tile->getContainer() != nullptr &&
+                !tile->getContainer()->isNull()) {
                 count++;
             }
         }
         ss << count << "\n";
         for (auto &tile : gameManager->getTiles()) {
-            if (tile->getContainer() != nullptr && !tile->getContainer()->isNull()) {
+            if (tile->getContainer() != nullptr &&
+                !tile->getContainer()->isNull()) {
                 auto x = tile->getPos().x;
                 auto y = tile->getPos().y;
                 ss << x << ' ' << y << ' ';
@@ -160,24 +160,26 @@ class CliController : public Controller {
         if (nextInput.size() == 0) {
             int exit_status;
             if (process->try_get_exit_status(exit_status)) {
-                throw std::runtime_error("Process exited unexpectedly with status " + std::to_string(exit_status));
+                throw std::runtime_error(
+                    "Process exited unexpectedly with status " +
+                    std::to_string(exit_status));
             }
             std::unique_lock<std::mutex> lk(m);
-            cv.wait_for(
-                lk,
-                std::chrono::milliseconds(50),
-                [&] { return nextInput.size() > 0; });
+            cv.wait_for(lk, std::chrono::milliseconds(50),
+                        [&] { return nextInput.size() > 0; });
         }
         auto res = nextInput;
-        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - requestTime).count();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+                            std::chrono::system_clock::now() - requestTime)
+                            .count();
         if (res.size() == 0 || duration > 50) {
-            log<<"!!! Response timeout: " << duration << "ms" << std::endl;
+            log << "!!! Response timeout: " << duration << "ms" << std::endl;
             res.clear();
             for (auto &player : gameManager->getPlayers()) {
                 res.push_back("Move");
             }
         } else {
-            log<<"!!! Response time: " << duration << "ms" << std::endl;
+            log << "!!! Response time: " << duration << "ms" << std::endl;
         }
         nextInput.clear();
         return res;
@@ -299,8 +301,7 @@ class MainWindow : public QMainWindow {
         controller->init(levelFile);
 
         auto t = QThread::create([&]() {
-            auto lastTime =
-                std::chrono::system_clock::now();
+            auto lastTime = std::chrono::system_clock::now();
             while (true) {
                 step();
                 emit updated();
@@ -318,10 +319,7 @@ class MainWindow : public QMainWindow {
         connect(this, &MainWindow::updated, guiManager, &GuiManager::step);
     }
 
-    void closeEvent( QCloseEvent * event ) override
-    {
-        delete controller;
-    }
+    void closeEvent(QCloseEvent *event) override { delete controller; }
 
     std::pair<int, int> parseDirection(std::string direction) {
         int x = 0;
@@ -381,7 +379,7 @@ class MainWindow : public QMainWindow {
     GameManager *gameManager;
     Controller *controller;
 
-signals:
+  signals:
     void updated();
 };
 #endif // MAINWINDOW_H_
