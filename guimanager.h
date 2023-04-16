@@ -200,12 +200,13 @@ class GuiManager final : public QGraphicsScene {
         guiItems.push_back(guiOrder);
     }
 
+    void step() { clearKeys(); }
+
   public slots:
-    void step() {
+    void update() {
         for (auto &guiItem : guiItems) {
             guiItem->update();
         }
-        clearKeys();
     }
 
   private:

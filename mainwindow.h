@@ -303,20 +303,21 @@ class MainWindow : public QMainWindow {
         auto t = QThread::create([&]() {
             auto lastTime = std::chrono::system_clock::now();
             while (true) {
-                step();
-                emit updated();
+                emit onInput(controller->requestInputs());
                 auto now = std::chrono::system_clock::now();
                 auto duration =
                     std::chrono::duration_cast<std::chrono::milliseconds>(
                         now - lastTime);
                 lastTime = now;
                 if (duration.count() < 1000.0f / FPS) {
+                    qDebug("%f ms", 1000.0f / FPS - duration.count());
                     QThread::msleep(1000.0f / FPS - duration.count());
                 }
             }
         });
         t->start();
-        connect(this, &MainWindow::updated, guiManager, &GuiManager::step);
+        connect(this, &MainWindow::onInput, this, &MainWindow::step,
+                Qt::BlockingQueuedConnection);
     }
 
     void closeEvent(QCloseEvent *event) override { delete controller; }
@@ -345,8 +346,11 @@ class MainWindow : public QMainWindow {
         return {x, y};
     }
 
-    void step() {
-        auto inputs = controller->requestInputs();
+  signals:
+    void onInput(std::vector<std::string> inputs);
+
+  public slots:
+    void step(std::vector<std::string> inputs) {
         assert(inputs.size() == gameManager->getPlayers().size());
         for (int i = 0; i < inputs.size(); i++) {
             auto &input = inputs[i];
@@ -370,6 +374,8 @@ class MainWindow : public QMainWindow {
             }
         }
         gameManager->step();
+        guiManager->step();
+        guiManager->update();
     }
 
   private:
