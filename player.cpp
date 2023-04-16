@@ -20,7 +20,8 @@ void Player::lateUpdate() {
         body->SetLinearVelocity(b2Vec2(0, 0));
         body->SetEnabled(false);
         if (!onHand.isNull()) {
-            auto container = ContainerHolder(onHand.getContainerKind(), Mixture());
+            auto container =
+                ContainerHolder(onHand.getContainerKind(), Mixture());
             container.setRespawnPoint(onHand.getRespawnPoint());
             gameManager->entityManager.scheduleRespawn(std::move(container),
                                                        CONTAINER_RESPAWN_TIME);

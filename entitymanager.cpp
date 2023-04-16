@@ -9,10 +9,15 @@ void EntityManager::step() {
         respawnQueue.pop();
         auto [x, y] = container->getRespawnPoint();
         auto tile = gameManager->getTile(x, y);
-        if (!tile->put(*container)) {
-            respawnQueue.push(std::make_pair(current + 1, container));
-        } else {
+        if (tile->getContainer()->isNull() ||
+            tile->getContainer()->getContainerKind() ==
+                    ContainerKind::DirtyPlates &&
+                container->getContainerKind() == ContainerKind::DirtyPlates) {
+            auto res = tile->put(*container);
+            assert(res);
             delete container;
+        } else {
+            respawnQueue.push(std::make_pair(current + 1, container));
         }
     }
 }

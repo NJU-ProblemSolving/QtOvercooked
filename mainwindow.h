@@ -347,7 +347,6 @@ class MainWindow : public QMainWindow {
 
     void step() {
         auto inputs = controller->requestInputs();
-        inputs = GuiController(gameManager, guiManager).requestInputs();
         assert(inputs.size() == gameManager->getPlayers().size());
         for (int i = 0; i < inputs.size(); i++) {
             auto &input = inputs[i];

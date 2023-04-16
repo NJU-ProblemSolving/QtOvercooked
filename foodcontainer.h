@@ -235,6 +235,7 @@ class ContainerHolder {
     ContainerHolder &operator=(const ContainerHolder &other) = delete;
     ContainerHolder &operator=(ContainerHolder &&other) {
         if (container != nullptr) {
+            assert(isNull());
             delete container;
         }
         container = other.container;
@@ -261,7 +262,9 @@ class ContainerHolder {
     bool isNull() { return container == nullptr || container->isNull(); }
     bool isEmpty() { return container == nullptr || container->isEmpty(); }
 
-    ContainerKind getContainerKind() { return isNull() ? ContainerKind::None : container->getContainerKind(); }
+    ContainerKind getContainerKind() {
+        return isNull() ? ContainerKind::None : container->getContainerKind();
+    }
     const Mixture &getMixture() { return container->getMixture(); }
     void setMixture(const Mixture &mixture) {
         container->setMixture(mixture);
