@@ -1,0 +1,56 @@
+name: build
+on: 
+  push:
+  pull_request:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-20.04, ubuntu-22.04, windows-latest]
+        qt_ver: [6.4.3]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Set up X11 dependencies on Linux
+        run: |
+          sudo apt-get update
+          sudo apt-get install libgl1-mesa-dev libfontconfig1-dev libfreetype6-dev libx11-dev libx11-xcb-dev  libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev libxcb-util-dev libxcb-xinerama0-dev libxcb-xkb-dev libxkbcommon-dev libxkbcommon-x11-dev libatspi2.0-dev dbus-x11 libpcre2-dev libmd4c-dev xorg-dev libglu1-mesa-dev libfuse2
+        shell: bash
+        if: runner.os == 'Linux'
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: ${{ matrix.qt_ver }}
+
+      # - name: Build qt static
+      #   uses: anthepro/install-qt-static@v1
+      #   if: steps.cache-primes.outputs.cache-hit != 'true'
+      #   with:
+      #     version: ${{ matrix.qt_ver }}
+      #     dir: ${{ runner.temp }}/Qt-static
+      #     configure-args: -opensource -opengl desktop
+      #     submodules: qtbase,qttools
+
+      - name: build
+        env:
+          CMAKE_PREFIX_PATH: ${{ runner.temp }}/Qt-static/lib/cmake/Qt6
+        run: |
+          mkdir build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr '${{github.workspace}}'
+          cmake --build .
+          cmake --install . --prefix app
+          find .
+          # cpack -G "TGZ" -P QtOvercooked -R 1
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.os }}-${{ matrix.qt_ver }}
+          path: build
