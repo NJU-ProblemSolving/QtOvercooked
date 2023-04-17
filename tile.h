@@ -117,6 +117,7 @@ class TileTrashbin : public TileWall {
         auto kind = container.getContainerKind();
         auto trash = std::move(container);
         container = ContainerHolder(kind, Mixture());
+        container.setRespawnPoint(trash.getRespawnPoint());
         return true;
     }
 };
