@@ -20,8 +20,8 @@ IngredientBox 0 5 B 0
 5400 20 30 cB
 7200 60 30 pA cB
 2
-3 3
-6 6
+3.5 3.5
+6.5 6.5
 5
 0 7 Pot
 9 7 Pot

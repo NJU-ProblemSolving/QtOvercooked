@@ -107,11 +107,9 @@ class CliController : public Controller {
         ss << '\0';
         log << ">>> Request: \n" << ss.str() << "\n>>>" << std::endl;
         process->write(ss.str());
-        requestTime = std::chrono::system_clock::now();
     }
 
     std::vector<std::string> requestInputs() override {
-        frame += 1;
         std::stringstream ss;
         auto orderManager = &gameManager->orderManager;
         ss << "Frame " << orderManager->getFrame() << "\n";
@@ -127,7 +125,9 @@ class CliController : public Controller {
         for (auto &player : gameManager->getPlayers()) {
             auto x = player->getBody()->GetPosition().x;
             auto y = player->getBody()->GetPosition().y;
-            ss << x << ' ' << y;
+            auto vx = player->getBody()->GetLinearVelocity().x;
+            auto vy = player->getBody()->GetLinearVelocity().y;
+            ss << x << ' ' << y << ' ' << vx << ' ' << vy;
             if (player->getRespawnCountdown() > 0) {
                 ss << " " << player->getRespawnCountdown();
             }
@@ -160,6 +160,7 @@ class CliController : public Controller {
         process->write(ss.str());
         requestTime = std::chrono::system_clock::now();
 
+        auto timeout = (frame == 0 ? FIRST_RESPONSE_TIMEOUT : NORMAL_RESPONSE_TIMEOUT);
         if (nextInput.size() == 0) {
             int exit_status;
             if (process->try_get_exit_status(exit_status)) {
@@ -168,23 +169,26 @@ class CliController : public Controller {
                     std::to_string(exit_status));
             }
             std::unique_lock<std::mutex> lk(m);
-            cv.wait_for(lk, std::chrono::milliseconds(50),
+            cv.wait_for(lk, std::chrono::milliseconds(timeout),
                         [&] { return nextInput.size() > 0; });
         }
         auto res = nextInput;
+        nextInput.clear();
+
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
-                            std::chrono::system_clock::now() - requestTime)
-                            .count();
-        if (res.size() == 0 || duration > 50) {
-            log << "!!! Response timeout: " << duration << "ms" << std::endl;
+                            std::chrono::system_clock::now() - requestTime);
+        if (res.size() == 0 || duration > timeout) {
+            log << "!!! Response timeout: " << duration.count() << "ms" << std::endl;
             res.clear();
             for (auto &player : gameManager->getPlayers()) {
                 res.push_back("Move");
             }
         } else {
-            log << "!!! Response time: " << duration << "ms" << std::endl;
+            log << "!!! Response time: " << duration.count() << "ms" << std::endl;
         }
-        nextInput.clear();
+
+        frame += 1;
+
         return res;
     }
 
@@ -302,6 +306,7 @@ class MainWindow : public QMainWindow {
             controller = new GuiController(gameManager, guiManager);
         }
         controller->init(levelFile);
+        guiManager->updateItem();
 
         auto t = QThread::create([&]() {
             auto lastTime = std::chrono::system_clock::now();
@@ -313,7 +318,6 @@ class MainWindow : public QMainWindow {
                         now - lastTime);
                 lastTime = now;
                 if (duration.count() < 1000.0f / FPS) {
-                    qDebug("%f ms", 1000.0f / FPS - duration.count());
                     QThread::msleep(1000.0f / FPS - duration.count());
                 }
             }
@@ -354,14 +358,6 @@ class MainWindow : public QMainWindow {
 
   public slots:
     void step(std::vector<std::string> inputs) {
-        static auto lastTime = std::chrono::system_clock::now();
-        auto now = std::chrono::system_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
-            now - lastTime);
-        lastTime = now;
-        if (duration.count() < 1000.0f / FPS) {
-            qDebug("step %f ms", 1000.0f / FPS - duration.count());
-        }
         assert(inputs.size() == gameManager->getPlayers().size());
         for (int i = 0; i < inputs.size(); i++) {
             auto &input = inputs[i];

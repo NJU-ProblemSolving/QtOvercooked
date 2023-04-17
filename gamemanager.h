@@ -142,9 +142,9 @@ class GameManager {
         int playerCount;
         in >> playerCount;
         for (int i = 0; i < playerCount; i++) {
-            int x, y;
+            float x, y;
             in >> x >> y;
-            int pos = y * width + x;
+            int pos = (int)y * width + (int)x;
             assert(map[pos]->getTileKind() == TileKind::Floor);
             addPlayer(x, y);
         }
@@ -233,9 +233,9 @@ class GameManager {
 
     std::vector<IUpdatable *> updateList;
 
-    void addPlayer(int x, int y) {
+    void addPlayer(float x, float y) {
         auto player = new Player();
-        player->setSpawnPoint(b2Vec2(x + 0.5f, y + 0.5f));
+        player->setSpawnPoint(b2Vec2(x, y));
         player->initB2(world);
         player->setLevelManager(this);
 

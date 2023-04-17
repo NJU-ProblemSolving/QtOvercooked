@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 constexpr int FPS = 60;
 
 constexpr float PLAYER_RADIUS = 0.35f;
@@ -16,6 +18,9 @@ constexpr int OVERCOOK_TIME = 10 * FPS;
 constexpr int GENERAL_COOKING_TIME = 10 * FPS;
 constexpr int PLATE_WASHING_TIME = 3 * FPS;
 constexpr int PLATE_RETURN_DELAY = 5 * FPS;
+
+constexpr std::chrono::milliseconds FIRST_RESPONSE_TIMEOUT{5000};
+constexpr std::chrono::milliseconds NORMAL_RESPONSE_TIMEOUT{20};
 
 constexpr float SCALE = 30;
 constexpr float BORDERWIDTHS = 1;
