@@ -203,10 +203,11 @@ class GuiManager final : public QGraphicsScene {
     void step() { clearKeys(); }
 
   public slots:
-    void update() {
+    void updateItem() {
         for (auto &guiItem : guiItems) {
             guiItem->update();
         }
+        this->update();
     }
 
   private:

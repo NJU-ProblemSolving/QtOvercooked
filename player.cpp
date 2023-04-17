@@ -19,7 +19,7 @@ void Player::lateUpdate() {
         body->SetTransform(spawnPoint, 0);
         body->SetLinearVelocity(b2Vec2(0, 0));
         body->SetEnabled(false);
-        if (!onHand.isNull()) {
+        if (!onHand.isNull() && onHand.getContainerKind() != ContainerKind::None) {
             auto container =
                 ContainerHolder(onHand.getContainerKind(), Mixture());
             container.setRespawnPoint(onHand.getRespawnPoint());

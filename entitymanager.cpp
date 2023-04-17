@@ -10,9 +10,9 @@ void EntityManager::step() {
         auto [x, y] = container->getRespawnPoint();
         auto tile = gameManager->getTile(x, y);
         if (tile->getContainer()->isNull() ||
-            tile->getContainer()->getContainerKind() ==
+            (tile->getContainer()->getContainerKind() ==
                     ContainerKind::DirtyPlates &&
-                container->getContainerKind() == ContainerKind::DirtyPlates) {
+             container->getContainerKind() == ContainerKind::DirtyPlates)) {
             auto res = tile->put(*container);
             assert(res);
             delete container;

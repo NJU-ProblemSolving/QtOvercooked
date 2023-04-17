@@ -351,6 +351,14 @@ class MainWindow : public QMainWindow {
 
   public slots:
     void step(std::vector<std::string> inputs) {
+        static auto lastTime = std::chrono::system_clock::now();
+        auto now = std::chrono::system_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+            now - lastTime);
+        lastTime = now;
+        if (duration.count() < 1000.0f / FPS) {
+            qDebug("step %f ms", 1000.0f / FPS - duration.count());
+        }
         assert(inputs.size() == gameManager->getPlayers().size());
         for (int i = 0; i < inputs.size(); i++) {
             auto &input = inputs[i];
@@ -375,7 +383,7 @@ class MainWindow : public QMainWindow {
         }
         gameManager->step();
         guiManager->step();
-        guiManager->update();
+        guiManager->updateItem();
     }
 
   private:

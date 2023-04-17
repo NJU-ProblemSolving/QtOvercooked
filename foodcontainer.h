@@ -90,7 +90,13 @@ class FoodContainer {
             other.containerKind = ContainerKind::None;
             return true;
         }
-        assert(this->containerKind != ContainerKind::None);
+        if (this->containerKind == ContainerKind::DirtyPlates) {
+            return false;
+        }
+
+        if (this->containerKind == ContainerKind::None) {
+            return false;
+        }
         if (other.mixture.isEmpty()) {
             return false;
         }
@@ -330,6 +336,14 @@ class ContainerHolder {
         }
 
         // 倾倒规则
+
+        // 若 this 已经煮熟且 other 为盘子，优先将 this 倒入 other。
+        if (container->isWorking() && container->getProgress() >= 1) {
+            auto res = other.container->directPut(*container);
+            propertyChanged = true;
+            other.propertyChanged = true;
+            return res;
+        }
 
         // 若 this 上存在容器，则会将 other 的物品（食材或容器中的内容）
         // 全部倒入 this 上的容器中。不存在只倾倒一部分的情况。
