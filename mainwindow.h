@@ -128,6 +128,9 @@ class CliController : public Controller {
             auto x = player->getBody()->GetPosition().x;
             auto y = player->getBody()->GetPosition().y;
             ss << x << ' ' << y;
+            if (player->getRespawnCountdown() > 0) {
+                ss << " " << player->getRespawnCountdown();
+            }
             if (!player->getOnHand()->isNull()) {
                 ss << " ; ";
                 printContainer(ss, player->getOnHand());

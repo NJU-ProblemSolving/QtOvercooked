@@ -100,6 +100,8 @@ class Player : public IUpdatable, public IBody {
         }
     }
 
+    int getRespawnCountdown() { return respawnCountdown; }
+
     ContainerHolder *getOnHand() { return &onHand; }
 
   protected:

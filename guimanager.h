@@ -84,6 +84,7 @@ class GuiPlayer : public GuiItem {
         graphicsItem->setPos((pos.x - PLAYER_RADIUS) * SCALE,
                              (pos.y - PLAYER_RADIUS) * SCALE);
         guiFoodContainer->update();
+        graphicsItem->setVisible(player->getRespawnCountdown() == 0);
     }
 
     QGraphicsItem *getGraphicsItem() override { return graphicsItem; }
