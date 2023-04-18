@@ -28,7 +28,7 @@ class GameManager {
 
         std::ifstream in(path);
         // Ensure that the path is valid.
-        if (in.good()) {
+        if (!in.good()) {
             throw std::runtime_error("Invalid level file " + path);
         }
 
