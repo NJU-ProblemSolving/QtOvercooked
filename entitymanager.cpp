@@ -11,7 +11,7 @@ void EntityManager::step() {
         auto tile = gameManager->getTile(x, y);
         if (tile->getContainer()->isNull() ||
             (tile->getContainer()->getContainerKind() ==
-                    ContainerKind::DirtyPlates &&
+                 ContainerKind::DirtyPlates &&
              container->getContainerKind() == ContainerKind::DirtyPlates)) {
             auto res = tile->put(*container);
             assert(res);

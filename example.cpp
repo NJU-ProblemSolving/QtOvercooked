@@ -1,12 +1,7 @@
 #include <iostream>
-#include <string>
 #include <sstream>
-
-#ifdef WIN
-#include <windows.h>
-#else
-#include <unistd.h>
-#endif
+#include <string>
+#include <cassert>
 
 using namespace std;
 
@@ -20,35 +15,47 @@ int main() {
 
     int frame;
 
-    // Read initial map and do your work.
+    // 读取初始地图信息
     std::getline(cin, s, '\0');
     ss << s;
 
-    // Read total game frame from ss.
-    // Here is a placeholder
+    int width, height;
+    ss >> width >> height;
+    cerr << "Map size: " << width << "x" << height << std::endl;
+
+    // 读取剩下的地图信息，此处仅作示例
     frame = 1000000;
+    ss.str("");
 
-    usleep(3000000);
-    ss.clear();
-
-    for (int i = 0; i < frame ; i++) {
+    for (int i = 0; i < frame; i++) {
         std::getline(cin, s, '\0');
         ss << s;
-        ss.clear();
 
+        // 如果输入流中还有数据，说明游戏已经在请求下一帧了。
+        // 这时候我们应该跳过当前帧，以便能够及时响应游戏。
         if (cin.rdbuf()->in_avail() > 0) {
-            cerr << "Warning: skipping frame " << i << " to catch up with the game" << std::endl;
+            cerr << "Warning: skipping frame " << i
+                 << " to catch up with the game" << std::endl;
             continue;
         }
 
-        cerr << "Handling frame " << i << std::endl;
+        // 读取当前帧的游戏状态
+        ss >> s;
+        assert(s == "Frame");
+        int currentFrame;
+        ss >> currentFrame;
+        assert(currentFrame == i);
 
+        // 读取剩下的信息，此处仅作示例
+        for (int k = 0; k < 1000000; k++)
+            ;
+        ss.str("");
+
+        // 输出当前帧的操作，此处仅作示例
         cout << "Frame " << i << "\n";
         cout << "Move R\n";
         cout << "Move U\n";
+        // 不要忘记刷新输出流，否则游戏将无法及时收到响应
         cout.flush();
-
-        for (int k = 0; k < 40000000; k++);
-        if (rand() % 100 == 0) { sleep(1); }
     }
 }

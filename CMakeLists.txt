@@ -66,6 +66,12 @@ target_link_libraries(${PROJECT_NAME} PUBLIC box2d)
 add_subdirectory(tiny-process-library)
 target_link_libraries(${PROJECT_NAME} PUBLIC tiny-process-library)
 
+add_executable(runner entitymanager.cpp player.cpp recipe.cpp tile.cpp runner.cpp)
+target_link_libraries(runner PUBLIC box2d)
+target_link_libraries(runner PUBLIC tiny-process-library)
+
+install(TARGETS runner
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com

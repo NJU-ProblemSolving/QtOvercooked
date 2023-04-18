@@ -5,8 +5,6 @@
 #include <QKeyEvent>
 #include <QMap>
 
-#include <tiny-process-library/process.hpp>
-
 #include "config.h"
 #include "foodcontainer.h"
 #include "gamemanager.h"
@@ -45,36 +43,32 @@ class GuiFoodContainer : public GuiItem {
 
     void update() override {
         if (foodContainer->isPropertyChanged()) {
-            if (foodContainer->getContainerKind() == ContainerKind::Plate)
-            {
+            if (foodContainer->getContainerKind() == ContainerKind::Plate) {
                 QPixmap image(":/img/images/Plate.png");
                 picItem->setPixmap(image.scaled(SCALE, SCALE));
                 picItem->setVisible(true);
                 graphicsItem->setPlainText(
                     QString::fromStdString(foodContainer->toString()));
-            }
-            else if (foodContainer->getContainerKind() == ContainerKind::Pan)
-            {
+            } else if (foodContainer->getContainerKind() ==
+                       ContainerKind::Pan) {
                 QPixmap image(":/img/images/Pan.PNG");
                 picItem->setPos(-SCALE / 4, SCALE / 3);
                 picItem->setPixmap(image.scaled(SCALE * 1.5, SCALE * 1.5));
                 picItem->setVisible(true);
                 graphicsItem->setPlainText(
                     QString::fromStdString(foodContainer->toString()));
-            }
-            else if (foodContainer->getContainerKind() == ContainerKind::Pot)
-            {
+            } else if (foodContainer->getContainerKind() ==
+                       ContainerKind::Pot) {
                 QPixmap image(":/img/images/Pot.PNG");
                 picItem->setPos(-SCALE / 2, 0);
                 picItem->setPixmap(image.scaled(SCALE * 2, SCALE * 2));
                 picItem->setVisible(true);
                 graphicsItem->setPlainText(
                     QString::fromStdString(foodContainer->toString()));
-            }
-          else {
-            graphicsItem->setPlainText(
-                QString::fromStdString(foodContainer->toString()));
-             picItem->setVisible(false);
+            } else {
+                graphicsItem->setPlainText(
+                    QString::fromStdString(foodContainer->toString()));
+                picItem->setVisible(false);
             }
             if (foodContainer->isWorking()) {
                 progress->setVisible(true);
@@ -88,7 +82,7 @@ class GuiFoodContainer : public GuiItem {
                 progress->setVisible(false);
                 overcookProgress->setVisible(false);
             }
-       }
+        }
     }
 
     QGraphicsItem *getGraphicsItem() override { return graphicsItem; }
@@ -98,7 +92,7 @@ class GuiFoodContainer : public GuiItem {
     QGraphicsTextItem *graphicsItem;
     QGraphicsRectItem *progress;
     QGraphicsRectItem *overcookProgress;
-    QGraphicsPixmapItem* picItem;
+    QGraphicsPixmapItem *picItem;
 };
 
 class GuiPlayer : public GuiItem {
@@ -166,66 +160,46 @@ class GuiTile : public GuiItem {
             if (kind == TileKind::IngredientBox) {
                 auto pantry = static_cast<TileIngredientBox *>(tile);
                 std::string label = pantry->getIngredient();
-                if (label == "fish")
-                {
+                if (label == "fish") {
                     QPixmap image(":/img/images/fish.png");
                     pic->setPixmap(image.scaled(SCALE, SCALE));
-                    pic->setPos(0,  0);
-                }
-                else if (label == "kelp")
-                {
+                    pic->setPos(0, 0);
+                } else if (label == "kelp") {
                     QPixmap image(":/img/images/kelp.png");
                     pic->setPixmap(image.scaled(SCALE, SCALE));
                     pic->setPos(0, 0);
-                }
-                else if (label == "rice")
-                {
+                } else if (label == "rice") {
                     QPixmap image(":/img/images/rice.png");
                     pic->setPixmap(image.scaled(SCALE, SCALE));
                     pic->setPos(0, 0);
-                }
-                else {
+                } else {
                     assert(0);
                 }
-            }
-            else if (kind == TileKind::ChoppingStation)
-            {
+            } else if (kind == TileKind::ChoppingStation) {
                 QPixmap image(":/img/images/ChoppingStation.png");
                 pic->setPixmap(image.scaled(SCALE, SCALE));
                 pic->setPos(0, 0);
-            }
-            else if (kind == TileKind::Stove)
-            {
+            } else if (kind == TileKind::Stove) {
                 QPixmap image(":/img/images/Stove.png");
                 pic->setPixmap(image.scaled(SCALE, SCALE));
                 pic->setPos(0, 0);
-            }
-            else if (kind == TileKind::Trashbin)
-            {
+            } else if (kind == TileKind::Trashbin) {
                 QPixmap image(":/img/images/Trashbin.png");
                 pic->setPixmap(image.scaled(SCALE, SCALE));
                 pic->setPos(0, 0);
-            }
-            else if (kind == TileKind::PlateReturn)
-            {
+            } else if (kind == TileKind::PlateReturn) {
                 QPixmap image(":/img/images/PlateReturn.png");
                 pic->setPixmap(image.scaled(SCALE, SCALE));
                 pic->setPos(0, 0);
-            }
-            else if (kind == TileKind::Sink)
-            {
+            } else if (kind == TileKind::Sink) {
                 QPixmap image(":/img/images/Sink.png");
                 pic->setPixmap(image.scaled(SCALE, SCALE));
                 pic->setPos(0, 0);
-            }
-            else if (kind == TileKind:: PlateRack)
-            {
+            } else if (kind == TileKind::PlateRack) {
                 QPixmap image(":/img/images/PlateRack.png");
                 pic->setPixmap(image.scaled(SCALE, SCALE));
                 pic->setPos(0, 0);
-            }
-            else if (kind == TileKind::ServiceWindow)
-            {
+            } else if (kind == TileKind::ServiceWindow) {
 
                 text->setPos(0, 0.4 * SCALE);
             }
@@ -259,7 +233,9 @@ class GuiOrder : public GuiItem {
 
     void update() override {
         std::stringstream ss;
-        ss << "Frame: " << orderManager->getFrame() << "/"  << orderManager->getFrame() + orderManager->getTimeCountdown() << '\n';
+        ss << "Frame: " << orderManager->getFrame() << "/"
+           << orderManager->getFrame() + orderManager->getTimeCountdown()
+           << '\n';
         ss << "Fund: " << orderManager->getFund() << '\n';
         for (auto &order : orderManager->getOrders()) {
             ss << order.time << ' ' << order.price << ' '

@@ -338,7 +338,7 @@ class ContainerHolder {
         // 倾倒规则
 
         // 若 this 已经煮熟且 other 为盘子，优先将 this 倒入 other。
-        if (container->isWorking()  &&
+        if (container->isWorking() &&
             other.getContainerKind() == ContainerKind::Plate &&
             container->getProgress() >= 1) {
             auto res = other.container->directPut(*container);

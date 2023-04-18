@@ -1,10 +1,5 @@
 #pragma once
 
-#include <QDebug>
-#include <QGraphicsEllipseItem>
-#include <QGraphicsItem>
-#include <QGraphicsRectItem>
-#include <QGraphicsScene>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -27,10 +22,15 @@ class GameManager {
     GameManager() {}
 
     void loadLevel(const std::string &path) {
+
         world = new b2World(b2Vec2(0.0f, 0.0f));
         world->SetContactListener(new CollisionListener());
 
         std::ifstream in(path);
+        // Ensure that the path is valid.
+        if (in.good()) {
+            throw std::runtime_error("Invalid level file " + path);
+        }
 
         in >> width >> height;
         map.resize(width * height);

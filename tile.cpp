@@ -32,7 +32,8 @@ void TileStove::lateUpdate() {
 
     if (!containerOnTable.isWorking()) {
         for (auto &recipe : gameManager->getRecipes()) {
-            if (containerOnTable.matchRecipe(&recipe) && recipe.tileKind == tileKind) {
+            if (containerOnTable.matchRecipe(&recipe) &&
+                recipe.tileKind == tileKind) {
                 containerOnTable.setRecipe(&recipe);
                 break;
             }
@@ -40,7 +41,9 @@ void TileStove::lateUpdate() {
     }
 
     if (!containerOnTable.isWorking()) {
-        if (!containerOnTable.isEmpty() && (containerOnTable.getContainerKind() == ContainerKind::Pan || containerOnTable.getContainerKind() == ContainerKind::Pot)) {
+        if (!containerOnTable.isEmpty() &&
+            (containerOnTable.getContainerKind() == ContainerKind::Pan ||
+             containerOnTable.getContainerKind() == ContainerKind::Pot)) {
             containerOnTable.setRecipe(&GeneralCookingRecipe);
         } else {
             return;

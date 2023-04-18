@@ -1,7 +1,6 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 
-#include <QDebug>
 #include <box2d/box2d.h>
 
 #include "config.h"
