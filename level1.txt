@@ -5,26 +5,28 @@
 *........p
 A........$
 B........t
-*........*
+C........*
 s........s
 *....... *
 *kr*******
-2
-IngredientBox 0 4 A 0
-IngredientBox 0 5 B 0
 3
-90 A -chop-> cA
-600 cA -pot-> pA
-90 B -chop-> cB
+IngredientBox 0 4 fish 0
+IngredientBox 0 5 kelp 0
+IngredientBox 0 6 rice 0
+4
+90 fish -chop-> c_fish
+600 c_fish -pan-> p_fish
+600 rice -pot-> s_rice
+90 kelp -chop-> c_kelp
 14400 123456 2
-5400 20 30 cB
-7200 60 30 pA cB
+5400 20 30 c_fish
+7200 60 30 s_rice c_fish kelp
 2
 3.5 3.5
 6.5 6.5
 5
 0 7 Pot
-9 7 Pot
+9 7 Pan
 3 9 Plate
 4 9 Plate
 5 9 Plate

@@ -57,10 +57,10 @@ class FoodContainer {
     int getProgressMaxTick() { return this->recipe->time; }
     float calcPriceFactor() {
         if (collided) {
-            return 0.7;
+            return 0.8;
         }
         if (overcooked) {
-            return 0.8;
+            return 0.7;
         }
         return 1.0;
     }

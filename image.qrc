@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/img">
+        <file>images/fish.png</file>
+        <file>images/kelp.png</file>
+        <file>images/rice.png</file>
+        <file>images/PlateReturn.png</file>
+        <file>images/ChoppingStation.png</file>
+        <file>images/Stove.png</file>
+        <file>images/Trashbin.png</file>
+        <file>images/Plate.png</file>
+        <file>images/Pan.PNG</file>
+        <file>images/Pot.PNG</file>
+        <file>images/PlateRack.png</file>
+        <file>images/Sink.png</file>
+    </qresource>
+</RCC>
