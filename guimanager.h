@@ -153,7 +153,7 @@ class GuiTile : public GuiItem {
             graphicsItem->setZValue(1);
             break;
         case TileKind::ServiceWindow:
-            graphicsItem->setBrush(QBrush(QColor("#99CC00")));
+            graphicsItem->setBrush(QBrush(QColor("#FFC0CB")));
             graphicsItem->setPen(QPen(Qt::black));
             graphicsItem->setZValue(1);
             break;

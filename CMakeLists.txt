@@ -22,6 +22,8 @@ set(PROJECT_SOURCES
         mainwindow.h
         mainwindow.ui
 
+        image.qrc
+
         config.h
         interfaces.h enums.h
         tile.h tile.cpp
