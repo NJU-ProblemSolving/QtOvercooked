@@ -46,8 +46,6 @@ jobs:
           cd build
           cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr '${{github.workspace}}'
           cmake --build .
-          cmake --install . --prefix app
-          find .
           # cpack -G "TGZ" -P QtOvercooked -R 1
 
       - uses: actions/upload-artifact@v3

@@ -1,6 +1,6 @@
 #include "controller.h"
 #include "gamemanager.h"
-#include "getopt.h"
+#include "mygetopt.h"
 
 std::pair<int, int> parseDirection(std::string direction) {
     int x = 0;

@@ -9,7 +9,7 @@
 #include <fstream>
 
 #include "./ui_mainwindow.h"
-#include "getopt.h"
+#include "mygetopt.h"
 #include "guimanager.h"
 #include "controller.h"
 
