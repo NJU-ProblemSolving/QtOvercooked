@@ -28,7 +28,7 @@ enum class TileKind {
 
 inline TileKind getTileKind(char kindChar) {
     switch (kindChar) {
-    case ' ':
+    case '_':
         return TileKind::Void;
     case '.':
         return TileKind::Floor;

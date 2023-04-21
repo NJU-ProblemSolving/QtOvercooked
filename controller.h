@@ -114,9 +114,7 @@ class CliController : public Controller {
             auto vx = player->getBody()->GetLinearVelocity().x;
             auto vy = player->getBody()->GetLinearVelocity().y;
             ss << x << ' ' << y << ' ' << vx << ' ' << vy;
-            if (player->getRespawnCountdown() > 0) {
-                ss << " " << player->getRespawnCountdown();
-            }
+            ss << " " << player->getRespawnCountdown();
             if (!player->getOnHand()->isNull()) {
                 ss << " ; ";
                 printContainer(ss, player->getOnHand());
