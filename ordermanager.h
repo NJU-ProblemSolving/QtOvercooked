@@ -60,7 +60,7 @@ class OrderManager {
             std::remove_if(orders.begin(), orders.end(),
                            [](const Order &order) { return order.time <= 0; }),
             orders.end());
-        for (int i = orders.size(); i < 4; i++) {
+        for (auto i = orders.size(); i < 4; i++) {
             generateOrder();
         }
     }

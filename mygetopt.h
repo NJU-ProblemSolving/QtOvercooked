@@ -1,4 +1,7 @@
 #pragma once
+#ifndef _MSC_VER
+#include <getopt.h>
+#else
 
 #include <stdio.h>
 #include <string.h>
@@ -7,7 +10,7 @@ static int opterr = 1, /* if error message should be printed */
     optind = 1, /* index into parent argv vector */
     optopt,     /* character checked for validity */
     optreset;   /* reset getopt */
-static char *optarg;   /* argument associated with option */
+static const char *optarg;   /* argument associated with option */
 
 #define BADCH (int)'?'
 #define BADARG (int)':'
@@ -18,7 +21,7 @@ static char *optarg;   /* argument associated with option */
  *      Parse argc/argv argument vector.
  */
 inline int getopt(int nargc, char *const nargv[], const char *ostr) {
-    static char *place = EMSG; /* option letter processing */
+    static const char *place = EMSG; /* option letter processing */
     const char *oli;           /* option letter list index */
 
     if (optreset || !*place) { /* update scanning pointer */
@@ -67,3 +70,5 @@ inline int getopt(int nargc, char *const nargv[], const char *ostr) {
     }
     return (optopt); /* dump back option letter */
 }
+
+#endif

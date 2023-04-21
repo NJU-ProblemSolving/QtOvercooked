@@ -58,20 +58,23 @@ else()
     endif()
 endif()
 
+qt_disable_unicode_defines(${PROJECT_NAME})
+
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 
 add_subdirectory(box2d)
-target_link_libraries(${PROJECT_NAME} PUBLIC box2d)
-
 add_subdirectory(tiny-process-library)
+
+target_link_libraries(${PROJECT_NAME} PUBLIC box2d)
 target_link_libraries(${PROJECT_NAME} PUBLIC tiny-process-library)
+
+install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CAMKE_INSTALL_BINDIR})
 
 add_executable(runner entitymanager.cpp player.cpp recipe.cpp tile.cpp runner.cpp)
 target_link_libraries(runner PUBLIC box2d)
 target_link_libraries(runner PUBLIC tiny-process-library)
 
-install(TARGETS runner
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(TARGETS runner LIBRARY DESTINATION ${CAMKE_INSTALL_BINDIR})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
@@ -80,8 +83,6 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
 )
-
-qt_disable_unicode_defines(${PROJECT_NAME})
 
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(${PROJECT_NAME})
