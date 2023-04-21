@@ -21,8 +21,10 @@ std::pair<int, int> parseDirection(std::string direction) {
             break;
         }
     }
-    assert(x <= 1 && x >= -1);
-    assert(y <= 1 && y >= -1);
+    if (x < -1) x = -1;
+    if (x > 1) x = 1;
+    if (y < -1) y = -1;
+    if (y > 1) y = 1;
     return {x, y};
 }
 
