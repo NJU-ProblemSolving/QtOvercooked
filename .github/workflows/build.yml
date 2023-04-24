@@ -48,6 +48,12 @@ jobs:
           cmake --build .
           # cpack -G "TGZ" -P QtOvercooked -R 1
 
+      - name: windeployqt
+        if: ${{ startsWith(matrix.os, 'windows') }}
+        run: |
+          cd build/Debug
+          windeployqt QtOvercooked.exe
+
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.os }}-${{ matrix.qt_ver }}
