@@ -60,9 +60,9 @@ class FoodContainer {
             return 0.8f;
         }
         if (overcooked) {
-            return 0.7;
+            return 0.7f;
         }
-        return 1.0;
+        return 1.0f;
     }
 
     void setRespawnPoint(std::pair<int, int> point) { respawnPoint = point; }
@@ -181,10 +181,10 @@ class FoodContainer {
     std::string toString() {
         std::string s;
         if (overcooked) {
-            s += " *";
+            s += "* ";
         }
         if (collided) {
-            s += " @";
+            s += "@ ";
         }
         switch (containerKind) {
         case ContainerKind::None:
