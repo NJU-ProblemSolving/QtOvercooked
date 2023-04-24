@@ -238,7 +238,7 @@ class GuiOrder : public GuiItem {
            << '\n';
         ss << "Fund: " << orderManager->getFund() << '\n';
         for (auto &order : orderManager->getOrders()) {
-            ss << order.time << ' ' << order.price << ' '
+            ss << order.countdown << ' ' << order.price << ' '
                << order.mixture.toString();
             ss << '\n';
         }

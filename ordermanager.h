@@ -1,6 +1,8 @@
 #pragma once
 
+#include <algorithm>
 #include <random>
+#include <ranges>
 #include <vector>
 
 #include "mixture.h"
@@ -8,11 +10,12 @@
 class Order {
   public:
     Order(const Mixture &mixture, int price, int time)
-        : mixture(mixture), price(price), time(time) {}
+        : mixture(mixture), price(price), countdown(time), totalTime(time) {}
 
     Mixture mixture;
     int price;
-    int time;
+    int countdown;
+    int totalTime;
 };
 
 class OrderTemplate {
@@ -51,38 +54,58 @@ class OrderManager {
         time++;
         timeCountdown--;
         for (auto &order : orders) {
-            order.time--;
-            if (order.time <= 0) {
+            order.countdown--;
+            if (order.countdown <= 0) {
                 tipFactor = 0;
             }
         }
-        orders.erase(
-            std::remove_if(orders.begin(), orders.end(),
-                           [](const Order &order) { return order.time <= 0; }),
-            orders.end());
+        orders.erase(std::remove_if(orders.begin(), orders.end(),
+                                    [](const Order &order) {
+                                        return order.countdown <= 0;
+                                    }),
+                     orders.end());
         for (auto i = orders.size(); i < 4; i++) {
             generateOrder();
         }
     }
 
     int serveDish(const Mixture &mixture) {
-        auto end = orders.end();
-        auto order =
-            std::find_if(orders.begin(), orders.end(), [&](const Order &order) {
-                return order.mixture == mixture;
-            });
-        int price = 0;
-        if (order != orders.end()) {
-            price = order->price + tipFactor * 8;
-            if (order == orders.begin()) {
-                tipFactor++;
-            } else {
-                tipFactor = 0;
+        auto orderPos = orders.size();
+        for (auto i = 0; i < orders.size(); i++) {
+            if (orders[i].mixture == mixture) {
+                if (orderPos == orders.size()) {
+                    orderPos = i;
+                } else {
+                    if (orders[i].countdown < orders[orderPos].countdown) {
+                        orderPos = i;
+                    }
+                }
             }
-            orders.erase(order);
+        }
+        if (orderPos == orders.size()) {
+            tipFactor = 0;
+            return 0;
+        }
+
+        auto order = &orders[orderPos];
+        int tip = 8;
+        if (order->countdown < order->totalTime / 3) {
+            tip = 3;
+        } else if (order->countdown < order->totalTime * 2 / 3) {
+            tip = 5;
+        } else {
+            tip = 8;
+        }
+        int price = order->price + tipFactor * tip;
+        if (orderPos == 0) {
+            tipFactor++;
+            if (tipFactor > 4) {
+                tipFactor = 4;
+            }
         } else {
             tipFactor = 0;
         }
+        orders.erase(orders.begin() + orderPos);
         return price;
     }
 

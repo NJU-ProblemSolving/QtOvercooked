@@ -103,7 +103,7 @@ class CliController : public Controller {
         ss << orderManager->getFund() << "\n";
         ss << orderManager->getOrders().size() << "\n";
         for (auto &order : orderManager->getOrders()) {
-            ss << order.time << ' ' << order.price << ' '
+            ss << order.countdown << ' ' << order.price << ' '
                << order.mixture.toString();
             ss << '\n';
         }

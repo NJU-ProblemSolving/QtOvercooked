@@ -9,9 +9,9 @@
 #include <fstream>
 
 #include "./ui_mainwindow.h"
-#include "mygetopt.h"
-#include "guimanager.h"
 #include "controller.h"
+#include "guimanager.h"
+#include "mygetopt.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -129,6 +129,9 @@ class MainWindow : public QMainWindow {
         auto t = QThread::create([&]() {
             auto lastTime = std::chrono::system_clock::now();
             while (true) {
+                if (gameManager->orderManager.getTimeCountdown() <= 0) {
+                    break;
+                }
                 emit onInput(controller->requestInputs());
                 auto now = std::chrono::system_clock::now();
                 auto duration =
@@ -166,10 +169,14 @@ class MainWindow : public QMainWindow {
                 break;
             }
         }
-        if (x < -1) x = -1;
-        if (x > 1) x = 1;
-        if (y < -1) y = -1;
-        if (y > 1) y = 1;
+        if (x < -1)
+            x = -1;
+        if (x > 1)
+            x = 1;
+        if (y < -1)
+            y = -1;
+        if (y > 1)
+            y = 1;
         return {x, y};
     }
 
@@ -185,18 +192,18 @@ class MainWindow : public QMainWindow {
             if (input.starts_with("Move")) {
                 auto direction = input.substr(4);
                 auto [x, y] = parseDirection(direction);
-                gameManager->move(i, b2Vec2(x, y));
+                gameManager->move(i, b2Vec2(float(x), float(y)));
             } else if (input.starts_with("Interact")) {
                 auto direction = input.substr(8);
                 auto [x, y] = parseDirection(direction);
-                x += player->getBody()->GetPosition().x;
-                y += player->getBody()->GetPosition().y;
+                x += (int)player->getBody()->GetPosition().x;
+                y += (int)player->getBody()->GetPosition().y;
                 gameManager->interact(i, x, y);
             } else if (input.starts_with("PutOrPick")) {
                 auto direction = input.substr(9);
                 auto [x, y] = parseDirection(direction);
-                x += player->getBody()->GetPosition().x;
-                y += player->getBody()->GetPosition().y;
+                x += (int)player->getBody()->GetPosition().x;
+                y += (int)player->getBody()->GetPosition().y;
                 gameManager->putOrPick(i, x, y);
             }
         }

@@ -21,14 +21,18 @@ std::pair<int, int> parseDirection(std::string direction) {
             break;
         }
     }
-    if (x < -1) x = -1;
-    if (x > 1) x = 1;
-    if (y < -1) y = -1;
-    if (y > 1) y = 1;
+    if (x < -1)
+        x = -1;
+    if (x > 1)
+        x = 1;
+    if (y < -1)
+        y = -1;
+    if (y > 1)
+        y = 1;
     return {x, y};
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     const char *levelFile = "level1.txt";
     const char *program = "a.out";
     int o;
@@ -81,4 +85,6 @@ int main(int argc, char* argv[]) {
     }
 
     printf("%d\n", gameManager->orderManager.getFund());
+
+    delete controller;
 }
