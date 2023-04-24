@@ -181,10 +181,10 @@ class FoodContainer {
     std::string toString() {
         std::string s;
         if (overcooked) {
-            s += "*";
+            s += " *";
         }
         if (collided) {
-            s += "@";
+            s += " @";
         }
         switch (containerKind) {
         case ContainerKind::None:
