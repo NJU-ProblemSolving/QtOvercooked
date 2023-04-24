@@ -25,9 +25,17 @@ jobs:
         if: runner.os == 'Linux'
 
       - name: Install Qt
+        if: ${{ !startsWith(matrix.os, 'windows') }}
         uses: jurplel/install-qt-action@v3
         with:
           version: ${{ matrix.qt_ver }}
+
+      - name: Install Qt mingw
+        if: ${{ startsWith(matrix.os, 'windows') }}
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: ${{ matrix.qt_ver }}
+          arch: win64_mingw
 
       # - name: Build qt static
       #   uses: anthepro/install-qt-static@v1
