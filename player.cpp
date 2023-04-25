@@ -19,15 +19,11 @@ void Player::lateUpdate() {
         body->SetTransform(spawnPoint, 0);
         body->SetLinearVelocity(b2Vec2(0, 0));
         body->SetEnabled(false);
-        if (!onHand.isNull() &&
-            onHand.getContainerKind() != ContainerKind::None) {
-            auto container =
-                ContainerHolder(onHand.getContainerKind(), Mixture());
-            container.setRespawnPoint(onHand.getRespawnPoint());
+        onHand.setMixture(Mixture());
+        if (!onHand.isNull()) {
+            auto container = std::move(onHand);
             gameManager->entityManager.scheduleRespawn(std::move(container),
                                                        CONTAINER_RESPAWN_TIME);
-            container = std::move(onHand);
-            onHand = ContainerHolder();
         }
         respawnCountdown = PLAYER_RESPAWN_TIME;
         tileInteracting = nullptr;
