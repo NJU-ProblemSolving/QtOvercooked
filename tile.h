@@ -114,10 +114,10 @@ class TileTrashbin : public TileWall {
     TileTrashbin() { tileKind = TileKind::Trashbin; }
 
     bool put(ContainerHolder &container) override {
-        auto kind = container.getContainerKind();
-        auto trash = std::move(container);
-        container = ContainerHolder(kind, Mixture());
-        container.setRespawnPoint(trash.getRespawnPoint());
+        if (container.isNull()) {
+            return false;
+        }
+        container.setMixture(Mixture());
         return true;
     }
 };
@@ -151,6 +151,15 @@ class TilePlateReturn : public TileTable {
 class TileSink : public TileTable {
   public:
     TileSink() { tileKind = TileKind::Sink; }
+
+    ContainerHolder pick() override {
+        if (containerOnTable.isNull() || (containerOnTable.getContainerKind() ==
+                                              ContainerKind::DirtyPlates &&
+                                          containerOnTable.isWorking())) {
+            return ContainerHolder();
+        }
+        return TileTable::pick();
+    }
 
     bool interact() override;
 };

@@ -29,7 +29,15 @@ class FoodContainer {
     bool isEmpty() { return mixture.isEmpty(); }
     ContainerKind getContainerKind() { return containerKind; }
     const Mixture &getMixture() { return mixture; }
-    void setMixture(const Mixture &mixture) { this->mixture = mixture; }
+    void setMixture(const Mixture &mixture) {
+        this->mixture = mixture;
+        if (mixture.isEmpty()) {
+            collided = false;
+            overcooked = false;
+            recipe = nullptr;
+            progress = 0;
+        }
+    }
 
     bool isWorking() { return recipe != nullptr; }
     bool matchRecipe(const Recipe *recipe) {

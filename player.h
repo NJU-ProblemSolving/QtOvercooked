@@ -72,6 +72,13 @@ class Player : public IUpdatable, public IBody {
             return;
         }
 
+        auto distance =
+            (body->GetPosition() - tile->getPos() - b2Vec2(0.5f, 0.5f))
+                .Length();
+        if (distance > PLAYER_PUTORPICK_DISTANCE) {
+            return;
+        }
+
         if (!onHand.isNull()) {
             tile->put(onHand);
         } else {
