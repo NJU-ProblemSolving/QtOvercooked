@@ -19,7 +19,9 @@ void Player::lateUpdate() {
         body->SetTransform(spawnPoint, 0);
         body->SetLinearVelocity(b2Vec2(0, 0));
         body->SetEnabled(false);
-        onHand.setMixture(Mixture());
+        if (!onHand.isNull()) {
+            onHand.setMixture(Mixture());
+        }
         if (!onHand.isNull()) {
             auto container = std::move(onHand);
             gameManager->entityManager.scheduleRespawn(std::move(container),
