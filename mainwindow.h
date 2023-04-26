@@ -100,14 +100,18 @@ class MainWindow : public QMainWindow {
     void init(int argc, char *argv[]) {
         const char *levelFile = "level1.txt";
         const char *program = nullptr;
+        bool printStderrToConsole = true;
         int o;
-        while ((o = getopt(argc, argv, "l:p:")) != -1) {
+        while ((o = getopt(argc, argv, "l:p:c")) != -1) {
             switch (o) {
             case 'l':
                 levelFile = optarg;
                 break;
             case 'p':
                 program = optarg;
+                break;
+            case 'c':
+                printStderrToConsole = true;
                 break;
             default:
                 printf("Unknown commandline argument %c\n", o);
@@ -119,7 +123,9 @@ class MainWindow : public QMainWindow {
         guiManager->init();
 
         if (program != nullptr) {
-            controller = new CliController(gameManager, program);
+            auto cli = new CliController(gameManager, program);
+            cli->setPrintStderrToConsole(printStderrToConsole);
+            controller = cli;
         } else {
             controller = new GuiController(gameManager, guiManager);
         }

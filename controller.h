@@ -3,6 +3,7 @@
 #include <chrono>
 #include <condition_variable>
 #include <fstream>
+#include <iostream>
 #include <mutex>
 
 #include <tiny-process-library/process.hpp>
@@ -24,6 +25,7 @@ class Controller {
 class CliController : public Controller {
     TinyProcessLib::Process *process;
     int frame = 0;
+    bool printStderrToConsole = true;
     std::ofstream log;
 
     std::mutex m;
@@ -75,6 +77,9 @@ class CliController : public Controller {
                 std::string s(bytes, n);
                 if (log.is_open()) {
                     log << "<<< Stderr: \n" << s << "\n<<<" << std::endl;
+                }
+                if (printStderrToConsole) {
+                    std::cerr << s;
                 }
             },
             true);
@@ -177,6 +182,10 @@ class CliController : public Controller {
         frame += 1;
 
         return res;
+    }
+
+    void setPrintStderrToConsole(bool value) {
+        printStderrToConsole = value;
     }
 
     void printContainer(std::ostream &os, ContainerHolder *container) {
