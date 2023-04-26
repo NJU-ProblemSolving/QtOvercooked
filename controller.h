@@ -25,7 +25,7 @@ class Controller {
 class CliController : public Controller {
     TinyProcessLib::Process *process;
     int frame = 0;
-    bool printStderrToConsole = true;
+    bool printStderrToConsole = false;
     std::ofstream log;
 
     std::mutex m;

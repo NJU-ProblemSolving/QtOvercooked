@@ -100,7 +100,7 @@ class MainWindow : public QMainWindow {
     void init(int argc, char *argv[]) {
         const char *levelFile = "level1.txt";
         const char *program = nullptr;
-        bool printStderrToConsole = true;
+        bool printStderrToConsole = false;
         int o;
         while ((o = getopt(argc, argv, "l:p:c")) != -1) {
             switch (o) {
