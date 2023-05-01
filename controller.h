@@ -184,9 +184,7 @@ class CliController : public Controller {
         return res;
     }
 
-    void setPrintStderrToConsole(bool value) {
-        printStderrToConsole = value;
-    }
+    void setPrintStderrToConsole(bool value) { printStderrToConsole = value; }
 
     void printContainer(std::ostream &os, ContainerHolder *container) {
         os << container->toString();

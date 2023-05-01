@@ -52,7 +52,7 @@ class Player : public IUpdatable, public IBody {
             friction += PLAYER_DECELERATION;
         }
 
-        if (velocity.Length() > PLAYER_EPISILON_SPEED) {
+        if (velocity.Length() > PLAYER_EPISILON_SPEED || direction.Length() > 0.1f) {
             auto force = velocityDirection;
             force *= -friction;
             body->ApplyForceToCenter(force, true);

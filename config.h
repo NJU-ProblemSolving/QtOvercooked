@@ -9,7 +9,9 @@ constexpr float PLAYER_ACCELERATION = 8.0f;
 constexpr float PLAYER_DECELERATION = 10.0f;
 constexpr float PLAYER_FRICTION = 2.0f;
 constexpr float PLAYER_MAX_SPEED = 5.0f;
-constexpr float PLAYER_EPISILON_SPEED = PLAYER_DECELERATION / FPS * 1.5f;
+constexpr float PLAYER_EPISILON_SPEED =
+    (PLAYER_DECELERATION + PLAYER_FRICTION) * 1.2f /
+    (PLAYER_RADIUS * PLAYER_RADIUS * 3.14) / FPS;
 constexpr float PLAYER_INTERACT_DISTANCE = 1.3f;
 constexpr float PLAYER_PUTORPICK_DISTANCE = 1.5f;
 
