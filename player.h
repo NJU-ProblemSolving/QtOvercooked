@@ -39,6 +39,10 @@ class Player : public IUpdatable, public IBody {
             return;
         }
 
+        this->moveDirection = direction;
+    }
+
+    void updateMove(b2Vec2 direction) {
         b2Vec2 velocity = body->GetLinearVelocity();
         b2Vec2 velocityDirection = velocity;
         velocityDirection.Normalize();
@@ -98,6 +102,11 @@ class Player : public IUpdatable, public IBody {
         tileInteracting = tile;
     }
 
+    void update() override {
+        updateMove(moveDirection);
+        moveDirection.SetZero();
+    }
+
     void lateUpdate() override;
 
     void collision(IBody *entity) {
@@ -117,6 +126,7 @@ class Player : public IUpdatable, public IBody {
 
     ContainerHolder onHand;
     Tile *tileInteracting = nullptr;
+    b2Vec2 moveDirection{0, 0};
 };
 
 #endif
