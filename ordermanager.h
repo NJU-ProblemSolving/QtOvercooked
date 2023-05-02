@@ -109,7 +109,7 @@ class OrderManager {
     }
 
     void generateOrder() {
-        std::uniform_int_distribution<int> u(0, totalWeight);
+        std::uniform_int_distribution<int> u(0, totalWeight - 1);
         int r = u(e);
         for (auto &orderTemplate : templates) {
             if (r < orderTemplate.weight) {
